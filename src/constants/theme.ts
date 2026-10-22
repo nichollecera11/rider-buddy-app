@@ -1,65 +1,107 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+export const COLORS = {
+  // Brand Palette (Rider Buddy - High Contrast Outdoors)
+  primary: "#FF6600", // Moto Orange
+  secondary: "#00E5FF", // Angkas Cyan
 
-import '@/global.css';
+  // Dark Backgrounds & Surfaces
+  bgDark: "#0B0F17", // Deep Obsidian
+  cardDark: "#161E2E", // Surface Card
+  inputDark: "#121824", // Field Input
+  borderDark: "#232D3F", // Subtle Borders
 
-import { Platform } from 'react-native';
+  // Status Colors (LTO Compliance & Parts Health)
+  success: "#4CAF50", // Green
+  warning: "#FF9800", // Orange
+  danger: "#F44336", // Red
 
-export const Colors = {
+  // Text Colors
+  textPrimary: "#FFFFFF",
+  textSecondary: "#94A3B8",
+  textMuted: "#64748B",
+
+  // Light / Dark scheme mappings (used by default Expo template hooks)
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: "#111827",
+    background: "#FFFFFF",
+    tint: "#FF6600",
+    icon: "#6B7280",
+    tabIconDefault: "#9CA3AF",
+    tabIconSelected: "#FF6600",
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: "#FFFFFF",
+    background: "#0B0F17",
+    tint: "#FF6600",
+    icon: "#9CA3AF",
+    tabIconDefault: "#64748B",
+    tabIconSelected: "#FF6600",
   },
-} as const;
+};
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export const Colors = COLORS;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
-  },
-});
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
 
-export const Spacing = {
-  half: 2,
+  // Word scale (expected by Expo template components)
   one: 4,
   two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
-} as const;
+  three: 12,
+  four: 16,
+  five: 20,
+  six: 24,
+  seven: 28,
+  eight: 32,
+  nine: 36,
+  ten: 40,
+};
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const Spacing = SPACING;
+export const spacing = SPACING;
+
+export const RADIUS = {
+  sm: 6,
+  md: 10,
+  lg: 16,
+  full: 9999,
+
+  one: 4,
+  two: 8,
+  three: 12,
+  four: 16,
+};
+
+export const Radius = RADIUS;
+export const radius = RADIUS;
+export const BorderRadius = RADIUS;
+export const borderRadius = RADIUS;
+
+export const FONTS = {
+  sans: "System",
+  serif: "Georgia",
+  mono: "PlatformMono",
+};
+
+export const Fonts = FONTS;
+export const fonts = FONTS;
+
+export default {
+  COLORS,
+  Colors,
+  SPACING,
+  Spacing,
+  spacing,
+  RADIUS,
+  Radius,
+  radius,
+  BorderRadius,
+  borderRadius,
+  FONTS,
+  Fonts,
+  fonts,
+};
