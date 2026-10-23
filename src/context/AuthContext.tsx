@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import client, { setupResponseInterceptors } from "../api/client";
+import client, { setSessionEndedHandler } from "../api/client";
+
 import storage from "../utils/storage";
 
 interface AuthContextType {
@@ -20,16 +21,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const removeResponseInterceptor = setupResponseInterceptors(() => {
+    setSessionEndedHandler(() => {
       setToken(null);
       setUser(null);
     });
-
-    void restoreSession();
-
-    return () => {
-      removeResponseInterceptor();
-    };
+    restoreSession();
+    return () => setSessionEndedHandler(null);
   }, []);
 
   const restoreSession = async () => {
