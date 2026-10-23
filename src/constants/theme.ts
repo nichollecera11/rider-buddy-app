@@ -1,40 +1,41 @@
 export const COLORS = {
-  // Brand Palette (Rider Buddy - High Contrast Outdoors)
-  primary: "#FF6600", // Moto Orange
-  secondary: "#00E5FF", // Angkas Cyan
+  // Figma Brand Palette
+  primary: "#FFD629", // Vibrant Gold / Yellow
+  darkBg: "#281137", // Deep Plum / Dark Carbon
+  accentPurple: "#4C246B", // Royal Purple Accent
+  softPurple: "#F2EAF7", // Light Purple Surface
 
-  // Dark Backgrounds & Surfaces
-  bgDark: "#0B0F17", // Deep Obsidian
-  cardDark: "#161E2E", // Surface Card
-  inputDark: "#121824", // Field Input
-  borderDark: "#232D3F", // Subtle Borders
+  // Neutral Surfaces
+  bgLight: "#FBFAF8", // Light Cream Background
+  bgCanvas: "#ECEAE5", // Canvas Radial
+  cardWhite: "#FFFFFF", // Card Surface
+  borderLight: "#E9E6EA", // Border Divider
 
-  // Status Colors (LTO Compliance & Parts Health)
-  success: "#4CAF50", // Green
-  warning: "#FF9800", // Orange
-  danger: "#F44336", // Red
+  // Status Tokens
+  success: "#20A573", // Online / Health Green
+  successBg: "#EDF8F3", // Soft Green Pill
+  warning: "#E7AB00", // Star Rating Yellow
+  danger: "#F44336", // Emergency Red
 
   // Text Colors
-  textPrimary: "#FFFFFF",
-  textSecondary: "#94A3B8",
-  textMuted: "#64748B",
+  textDark: "#18161B", // Dark Body Text
+  textMuted: "#77717C", // Muted Gray
+  textLight: "#FFFFFF", // Crisp White Text
 
-  // Light / Dark scheme mappings (used by default Expo template hooks)
+  // Light / Dark Fallbacks
   light: {
-    text: "#111827",
-    background: "#FFFFFF",
-    tint: "#FF6600",
-    icon: "#6B7280",
-    tabIconDefault: "#9CA3AF",
-    tabIconSelected: "#FF6600",
+    text: "#18161B",
+    background: "#FBFAF8",
+    tint: "#4C246B",
+    tabIconDefault: "#99949D",
+    tabIconSelected: "#4C246B",
   },
   dark: {
     text: "#FFFFFF",
-    background: "#0B0F17",
-    tint: "#FF6600",
-    icon: "#9CA3AF",
-    tabIconDefault: "#64748B",
-    tabIconSelected: "#FF6600",
+    background: "#281137",
+    tint: "#FFD629",
+    tabIconDefault: "#77717C",
+    tabIconSelected: "#FFD629",
   },
 };
 
@@ -46,9 +47,7 @@ export const SPACING = {
   md: 16,
   lg: 24,
   xl: 32,
-  xxl: 48,
 
-  // Word scale (expected by Expo template components)
   one: 4,
   two: 8,
   three: 12,
@@ -57,17 +56,16 @@ export const SPACING = {
   six: 24,
   seven: 28,
   eight: 32,
-  nine: 36,
-  ten: 40,
 };
 
 export const Spacing = SPACING;
 export const spacing = SPACING;
 
 export const RADIUS = {
-  sm: 6,
-  md: 10,
-  lg: 16,
+  sm: 8,
+  md: 14,
+  lg: 20,
+  xl: 24,
   full: 9999,
 
   one: 4,
@@ -78,8 +76,6 @@ export const RADIUS = {
 
 export const Radius = RADIUS;
 export const radius = RADIUS;
-export const BorderRadius = RADIUS;
-export const borderRadius = RADIUS;
 
 export const FONTS = {
   sans: "System",
@@ -99,8 +95,6 @@ export default {
   RADIUS,
   Radius,
   radius,
-  BorderRadius,
-  borderRadius,
   FONTS,
   Fonts,
   fonts,

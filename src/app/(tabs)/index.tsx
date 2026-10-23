@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
+    Image,
     SafeAreaView,
     ScrollView,
     Text,
@@ -13,167 +14,282 @@ import { styles } from "../../styles/home.styles";
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const router = useRouter();
+  const [selectedService, setSelectedService] = useState("Roadside");
 
-  const actions = [
+  const services = [
     {
-      id: "consult",
-      title: "Consult",
-      icon: "chatbubbles",
-      color: "#FF6600",
-      route: "/(tabs)/consults",
+      id: "Roadside",
+      label: "Roadside",
+      note: "Mechanic to you",
+      icon: "build-outline",
     },
     {
-      id: "garage",
-      title: "Garage",
-      icon: "bicycle",
-      color: "#00E5FF",
-      route: "/(tabs)/garage",
+      id: "Maintenance",
+      label: "Maintenance",
+      note: "Keep it running",
+      icon: "oil-drop",
     },
     {
-      id: "lto",
-      title: "LTO Butler",
-      icon: "document-text",
-      color: "#4CAF50",
-      route: "/(tabs)/garage",
+      id: "Tire care",
+      label: "Tire care",
+      note: "Repair or replace",
+      icon: "disc-outline",
     },
     {
-      id: "shop",
-      title: "Parts Shop",
-      icon: "cart",
-      color: "#E91E63",
-      route: "/(tabs)/shop",
-    },
-    {
-      id: "mechanics",
-      title: "Mechanics",
-      icon: "build",
-      color: "#FF9800",
-      route: "/(tabs)/consults",
-    },
-    {
-      id: "logs",
-      title: "Logs",
-      icon: "time",
-      color: "#9C27B0",
-      route: "/(tabs)/garage",
-    },
-    {
-      id: "roadside",
-      title: "Emergency",
-      icon: "warning",
-      color: "#F44336",
-      route: "/(tabs)/consults",
-    },
-    {
-      id: "more",
-      title: "More",
-      icon: "apps",
-      color: "#607D8B",
-      route: "/(tabs)/profile",
+      id: "Tow service",
+      label: "Tow service",
+      note: "Move safely",
+      icon: "car-outline",
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Top Navigation Header */}
+      <View style={styles.header}>
+        <View style={styles.logoGroup}>
+          <View style={styles.logoIconBadge}>
+            <Ionicons name="build" size={18} color={COLORS.darkBg} />
+          </View>
+          <Text style={styles.logoText}>RIDER BUDDY</Text>
+        </View>
+
+        <TouchableOpacity style={styles.bellBtn}>
+          <Ionicons
+            name="notifications-outline"
+            size={20}
+            color={COLORS.textDark}
+          />
+          <View style={styles.bellDot} />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Bar Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>MAAYONG BUNTAG 🇵🇭</Text>
-            <Text style={styles.userName}>{user?.name || "Rider"}</Text>
+        {/* Location Selector */}
+        <View style={styles.locationRow}>
+          <View style={styles.locationIconBox}>
+            <Ionicons name="location" size={18} color={COLORS.accentPurple} />
           </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.iconBtn}>
+          <View>
+            <Text style={styles.locationEyebrow}>SERVICE LOCATION</Text>
+            <TouchableOpacity style={styles.locationBtn}>
+              <Text style={styles.locationText}>Makati City, Metro Manila</Text>
               <Ionicons
-                name="notifications-outline"
-                size={20}
-                color={COLORS.textPrimary}
+                name="chevron-forward"
+                size={14}
+                color={COLORS.accentPurple}
               />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Motorcycle Switcher Card */}
-        <TouchableOpacity
-          style={styles.bikeSelectorCard}
-          onPress={() => router.push("/(tabs)/garage")}
-        >
-          <View style={styles.bikeInfo}>
-            <Ionicons name="bicycle" size={24} color={COLORS.primary} />
+        {/* Greeting Banner */}
+        <View style={styles.greetingRow}>
+          <View>
+            <Text style={styles.greetingEyebrow}>
+              Good morning, {user?.name || "Rider"}
+            </Text>
+            <Text style={styles.greetingTitle}>Let's get you moving.</Text>
+          </View>
+          <View style={styles.onlinePill}>
+            <View style={styles.onlineDot} />
+            <Text style={styles.onlineText}>24/7 online</Text>
+          </View>
+        </View>
+
+        {/* Vehicle Health Hero Card */}
+        <View style={styles.vehicleCard}>
+          <View style={styles.vehicleCardTop}>
             <View>
-              <Text style={styles.bikeName}>Yamaha NMAX 155</Text>
-              <Text style={styles.bikePlate}>Plate: ABC 1234 • 12,450 km</Text>
+              <View style={styles.vehicleEyebrowRow}>
+                <Ionicons name="car" size={14} color={COLORS.primary} />
+                <Text style={styles.vehicleEyebrowText}>YOUR VEHICLE</Text>
+              </View>
+              <Text style={styles.vehicleTitle}>Yamaha NMAX 155</Text>
+              <Text style={styles.vehicleSubtitle}>
+                2023 · 155cc VVA · NCG 4832
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.switchBtn}>
+              <Text style={styles.switchBtnText}>Switch</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.vehicleCardDivider} />
+
+          <View style={styles.vehicleCardBottom}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={styles.healthBadge}>
+                <Text style={styles.healthScoreText}>92</Text>
+              </View>
+              <View>
+                <Text style={styles.healthLabelTitle}>Vehicle health</Text>
+                <Text style={styles.healthLabelSub}>Everything looks good</Text>
+              </View>
+            </View>
+
+            <View style={styles.checkedBadge}>
+              <Ionicons
+                name="shield-checkmark"
+                size={14}
+                color={COLORS.primary}
+              />
+              <Text style={styles.checkedText}>Checked</Text>
             </View>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={COLORS.textMuted} />
+        </View>
+
+        {/* Quick Emergency Dispatch Banner */}
+        <TouchableOpacity style={styles.dispatchCard}>
+          <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+            <View style={styles.dispatchIconBox}>
+              <Ionicons name="flash" size={22} color={COLORS.darkBg} />
+            </View>
+            <View>
+              <Text style={styles.dispatchEyebrow}>NEED HELP NOW?</Text>
+              <Text style={styles.dispatchTitle}>Dispatch a mechanic</Text>
+              <Text style={styles.dispatchSubtitle}>ETA from 12 minutes</Text>
+            </View>
+          </View>
+          <View style={styles.dispatchBtn}>
+            <Text style={styles.dispatchBtnText}>Get help</Text>
+            <Ionicons name="chevron-forward" size={14} color="#FFF" />
+          </View>
         </TouchableOpacity>
 
-        {/* Hero LTO Compliance Status Banner */}
-        <View style={styles.heroBanner}>
-          <View style={styles.heroTop}>
-            <Text style={styles.heroTitle}>🛡️ LTO Compliance Guardian</Text>
-            <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>VALID</Text>
+        {/* Services Section */}
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text style={styles.sectionEyebrow}>EXPERT CARE</Text>
+            <Text style={styles.sectionTitleText}>What do you need?</Text>
+          </View>
+          <TouchableOpacity style={styles.actionBtn}>
+            <Text style={styles.actionBtnText}>View all</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={14}
+              color={COLORS.accentPurple}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.servicesGrid}>
+          {services.map((item) => {
+            const isSelected = selectedService === item.id;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.serviceCard,
+                  isSelected && styles.serviceCardActive,
+                ]}
+                onPress={() => setSelectedService(item.id)}
+              >
+                <View
+                  style={[
+                    styles.serviceIconBox,
+                    isSelected && styles.serviceIconBoxActive,
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={22}
+                    color={COLORS.darkBg}
+                  />
+                </View>
+                <Text style={styles.serviceTitle}>{item.label}</Text>
+                <Text style={styles.serviceNote}>{item.note}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Top Mechanic Nearby Section */}
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text style={styles.sectionEyebrow}>rIDER BUDDY VERIFIED</Text>
+            <Text style={styles.sectionTitleText}>Top mechanic nearby</Text>
+          </View>
+          <TouchableOpacity style={styles.actionBtn}>
+            <Text style={styles.actionBtnText}>See map</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={14}
+              color={COLORS.accentPurple}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.mechanicCard}>
+          <View style={{ position: "relative" }}>
+            <Image
+              source={{
+                uri: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=faces&cs=tinysrgb&fit=crop&fm=jpg&h=220&ixlib=rb-4.1.0&q=85&w=220",
+              }}
+              style={styles.mechanicAvatar}
+            />
+            <View style={styles.onlineIndicator} />
+          </View>
+
+          <View style={styles.mechanicInfo}>
+            <View style={styles.mechanicNameRow}>
+              <Text style={styles.mechanicName}>Carlo Mendoza</Text>
+              <Ionicons
+                name="shield-checkmark"
+                size={14}
+                color={COLORS.accentPurple}
+              />
+            </View>
+            <Text style={styles.mechanicTitle}>
+              ASE-certified master mechanic
+            </Text>
+
+            <View style={styles.mechanicMetaRow}>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 2 }}
+              >
+                <Ionicons name="star" size={12} color={COLORS.warning} />
+                <Text style={styles.ratingText}>
+                  4.9 <Text style={styles.ratingCountText}>(238)</Text>
+                </Text>
+              </View>
+              <Text style={styles.distanceText}>• 📍 1.2 km</Text>
             </View>
           </View>
-          <Text style={styles.heroSubtext}>
-            Registration active until{" "}
-            <Text style={{ fontWeight: "800", color: "#FFF" }}>
-              November 2026
-            </Text>
-            . Clean record verified[cite: 8].
-          </Text>
-        </View>
 
-        {/* 2x4 Action Grid */}
-        <Text style={sectionTitleStyle}>Services</Text>
-        <View style={styles.gridContainer}>
-          {actions.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.gridItem}
-              onPress={() => router.push(item.route as any)}
-            >
-              <View style={styles.gridIconBox}>
-                <Ionicons
-                  name={item.icon as any}
-                  size={26}
-                  color={item.color}
-                />
-              </View>
-              <Text style={styles.gridLabel}>{item.title}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Recent Consultation / Health Report Card */}
-        <Text style={sectionTitleStyle}>Recent Diagnostic Summary</Text>
-        <View style={styles.activityCard}>
-          <View style={styles.activityHeader}>
-            <Text style={styles.activityTitle}>
-              Brake System & CVT Inspection
-            </Text>
-            <Text style={styles.activityStatus}>COMPLETED</Text>
+          <View style={styles.mechanicChevronBtn}>
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={COLORS.accentPurple}
+            />
           </View>
-          <Text style={{ color: COLORS.textSecondary, fontSize: 13 }}>
-            Verified by{" "}
-            <Text style={{ color: "#FFF", fontWeight: "700" }}>
-              Master Mechanic Jun
+        </TouchableOpacity>
+
+        {/* Care Plan Banner */}
+        <TouchableOpacity style={styles.membershipCard}>
+          <Ionicons name="shield-half" size={38} color={COLORS.primary} />
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 8,
+                fontWeight: "900",
+                color: COLORS.primary,
+                letterSpacing: 1,
+              }}
+            >
+              RIDER BUDDY + CARE PLAN
             </Text>
-          </Text>
-        </View>
+            <Text style={styles.membershipTitle}>
+              Save 20% on every service
+            </Text>
+            <Text style={styles.membershipSub}>Explore membership</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const sectionTitleStyle = {
-  fontSize: 16,
-  fontWeight: "800" as const,
-  color: COLORS.textPrimary,
-  marginBottom: 12,
-};

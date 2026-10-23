@@ -1,0 +1,121 @@
+import { StyleSheet } from "react-native";
+import { COLORS, RADIUS, SPACING } from "../constants/theme";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.bgDark,
+  },
+  scrollContent: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: 50,
+    paddingBottom: 40,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFF",
+    marginBottom: SPACING.md,
+  },
+  profileCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.cardDark,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.borderDark,
+    marginBottom: SPACING.lg,
+  },
+  avatarBox: {
+    width: 60,
+    height: 60,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.inputDark,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  userEmail: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  badge: {
+    backgroundColor: "rgba(0, 229, 255, 0.15)",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    alignSelf: "flex-start",
+    marginTop: 6,
+  },
+  badgeText: {
+    color: COLORS.secondary,
+    fontSize: 10,
+    fontWeight: "800",
+  },
+  sectionTitle: {
+    color: COLORS.textPrimary,
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: SPACING.sm,
+  },
+  menuGroup: {
+    backgroundColor: COLORS.cardDark,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.borderDark,
+    marginBottom: SPACING.xl,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderDark,
+  },
+  menuLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  menuText: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  logoutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(244, 67, 54, 0.12)",
+    borderWidth: 1,
+    borderColor: COLORS.danger,
+    borderRadius: RADIUS.md,
+    height: 50,
+    marginBottom: SPACING.lg,
+  },
+  logoutBtnText: {
+    color: COLORS.danger,
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  versionText: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    textAlign: "center",
+  },
+});

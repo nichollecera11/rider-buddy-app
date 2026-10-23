@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import client, { setupResponseInterceptors } from "../api/client";
-import { storage } from "../utils/storage";
+import storage from "../utils/storage";
 
 interface AuthContextType {
   user: any | null;
   token: string | null;
-  isInitializing: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -17,31 +17,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Register auto-logout on 401/403 API response
-    setupResponseInterceptors(() => {
+    const removeResponseInterceptor = setupResponseInterceptors(() => {
       setToken(null);
       setUser(null);
     });
 
-    restoreSession();
+    void restoreSession();
+
+    return () => {
+      removeResponseInterceptor();
+    };
   }, []);
 
   const restoreSession = async () => {
     try {
-      const savedToken = await storage.getToken();
-      const savedUser = await storage.getUser();
+      const storedToken = await storage.getToken();
+      const storedUser = await storage.getUser();
 
-      if (savedToken && savedUser) {
-        setToken(savedToken);
-        setUser(savedUser);
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(storedUser);
       }
     } catch (e) {
-      console.error("Session restore failed", e);
+      console.error("Failed to restore session:", e);
     } finally {
-      setIsInitializing(false);
+      setLoading(false);
     }
   };
 
@@ -69,9 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, token, isInitializing, login, logout }}
-    >
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

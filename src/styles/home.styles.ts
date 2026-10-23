@@ -4,175 +4,461 @@ import { COLORS, RADIUS, SPACING } from "../constants/theme";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bgDark,
+    backgroundColor: COLORS.bgLight,
   },
   scrollContent: {
-    paddingHorizontal: SPACING.md,
-    paddingTop: 50,
-    paddingBottom: 40,
+    paddingHorizontal: SPACING.four,
+    paddingTop: SPACING.md,
+    paddingBottom: 100,
   },
 
-  // Header
+  // Header Bar
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: SPACING.lg,
+    paddingHorizontal: SPACING.four,
+    paddingVertical: SPACING.three,
+    backgroundColor: COLORS.bgLight,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
-  greeting: {
-    fontSize: 13,
-    color: COLORS.secondary,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
-  userName: {
-    fontSize: 20,
-    fontWeight: "900",
-    color: COLORS.textPrimary,
-    marginTop: 2,
-  },
-  headerActions: {
+  logoGroup: {
     flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
-  iconBtn: {
+  logoIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    transform: [{ rotate: "-6deg" }],
+  },
+  logoText: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: COLORS.darkBg,
+    letterSpacing: 2,
+  },
+  bellBtn: {
     width: 42,
     height: 42,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.cardDark,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+    backgroundColor: COLORS.cardWhite,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    position: "relative",
+  },
+  bellDot: {
+    position: "absolute",
+    top: 7,
+    right: 7,
+    width: 9,
+    height: 9,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentPurple,
+    borderWidth: 2,
+    borderColor: COLORS.cardWhite,
   },
 
-  // Motorcycle Switcher Badge
-  bikeSelectorCard: {
+  // Location Row
+  locationRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#1E293B",
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 12,
-    borderRadius: RADIUS.md,
-    marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: "#334155",
+    gap: 12,
+    marginBottom: SPACING.six,
+    marginTop: SPACING.two,
   },
-  bikeInfo: {
-    flexDirection: "row",
+  locationIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: RADIUS.two,
+    backgroundColor: COLORS.softPurple,
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
   },
-  bikeName: {
-    color: COLORS.textPrimary,
+  locationEyebrow: {
+    fontSize: 9,
     fontWeight: "800",
-    fontSize: 15,
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
-  bikePlate: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
+  locationBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 2,
+  },
+  locationText: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: COLORS.textDark,
   },
 
-  // Hero LTO Banner
-  heroBanner: {
-    backgroundColor: COLORS.cardDark,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.lg,
-    borderLeftWidth: 5,
-    borderLeftColor: COLORS.success,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
-  },
-  heroTop: {
+  // Greeting Banner
+  greetingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
+    alignItems: "flex-end",
+    marginBottom: SPACING.four,
   },
-  heroBadge: {
-    backgroundColor: "rgba(76, 175, 80, 0.15)",
+  greetingEyebrow: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  greetingTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: COLORS.textDark,
+    letterSpacing: -0.5,
+    marginTop: 4,
+  },
+  onlinePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: COLORS.successBg,
+    borderColor: "#D9EEE5",
+    borderWidth: 1,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: RADIUS.full,
   },
-  heroBadgeText: {
+  onlineDot: {
+    width: 6,
+    height: 6,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.success,
+  },
+  onlineText: {
+    fontSize: 9,
+    fontWeight: "800",
     color: COLORS.success,
+  },
+
+  // Vehicle Hero Card (Deep Purple)
+  vehicleCard: {
+    backgroundColor: COLORS.darkBg,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.five,
+    marginBottom: SPACING.three,
+  },
+  vehicleCardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  vehicleEyebrowRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  vehicleEyebrowText: {
+    fontSize: 9,
+    fontWeight: "800",
+    color: COLORS.primary,
+    letterSpacing: 1,
+  },
+  vehicleTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: COLORS.textLight,
+    marginTop: 8,
+  },
+  vehicleSubtitle: {
+    fontSize: 11,
+    color: "rgba(255, 255, 255, 0.55)",
+    marginTop: 2,
+  },
+  switchBtn: {
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  switchBtnText: {
+    fontSize: 9,
+    fontWeight: "700",
+    color: COLORS.textLight,
+  },
+  vehicleCardDivider: {
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    marginVertical: SPACING.four,
+  },
+  vehicleCardBottom: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  healthBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.full,
+    borderWidth: 3,
+    borderColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  healthScoreText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: COLORS.textLight,
+  },
+  healthLabelTitle: {
     fontSize: 11,
     fontWeight: "800",
+    color: COLORS.textLight,
   },
-  heroTitle: {
-    fontSize: 16,
+  healthLabelSub: {
+    fontSize: 9,
+    color: "rgba(255, 255, 255, 0.5)",
+    marginTop: 1,
+  },
+  checkedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  checkedText: {
+    fontSize: 9,
     fontWeight: "800",
-    color: COLORS.textPrimary,
+    color: COLORS.primary,
+    textTransform: "uppercase",
   },
-  heroSubtext: {
+
+  // Emergency Dispatch Banner (Yellow)
+  dispatchCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.four,
+    marginBottom: SPACING.six,
+  },
+  dispatchIconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: RADIUS.three,
+    backgroundColor: "rgba(255, 255, 255, 0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  dispatchEyebrow: {
+    fontSize: 8,
+    fontWeight: "900",
+    color: "rgba(40, 17, 55, 0.6)",
+    letterSpacing: 1,
+  },
+  dispatchTitle: {
     fontSize: 13,
-    color: COLORS.textSecondary,
-    marginTop: 4,
+    fontWeight: "800",
+    color: COLORS.darkBg,
+  },
+  dispatchSubtitle: {
+    fontSize: 10,
+    color: "rgba(40, 17, 55, 0.6)",
+  },
+  dispatchBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.darkBg,
+    borderRadius: RADIUS.two,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 4,
+  },
+  dispatchBtnText: {
+    fontSize: 10,
+    fontWeight: "900",
+    color: COLORS.textLight,
   },
 
   // Section Header
-  sectionTitle: {
-    fontSize: 16,
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginTop: SPACING.four,
+    marginBottom: SPACING.three,
+  },
+  sectionEyebrow: {
+    fontSize: 9,
+    fontWeight: "900",
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  sectionTitleText: {
+    fontSize: 19,
     fontWeight: "800",
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
+    color: COLORS.textDark,
+    letterSpacing: -0.5,
+    marginTop: 2,
+  },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  actionBtnText: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: COLORS.accentPurple,
   },
 
-  // 2x4 Action Grid
-  gridContainer: {
+  // Services Grid
+  servicesGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: 14,
-    marginBottom: SPACING.xl,
+    rowGap: 10,
+    marginBottom: SPACING.six,
   },
-  gridItem: {
-    width: "23%",
-    alignItems: "center",
-  },
-  gridIconBox: {
-    width: 58,
-    height: 58,
+  serviceCard: {
+    width: "48.5%",
+    minHeight: 135,
+    backgroundColor: COLORS.cardWhite,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
     borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.cardDark,
+    padding: SPACING.four,
+  },
+  serviceCardActive: {
+    backgroundColor: "#FDFAFF",
+    borderColor: "rgba(76, 36, 107, 0.35)",
+  },
+  serviceIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.three,
+    backgroundColor: "#FFF7CF",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    marginBottom: 14,
   },
-  gridLabel: {
-    color: COLORS.textSecondary,
-    fontSize: 11,
-    fontWeight: "600",
-    textAlign: "center",
+  serviceIconBoxActive: {
+    backgroundColor: COLORS.primary,
+  },
+  serviceTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: COLORS.textDark,
+  },
+  serviceNote: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    marginTop: 2,
   },
 
-  // Recent Activity Card
-  activityCard: {
-    backgroundColor: COLORS.cardDark,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
-  },
-  activityHeader: {
+  // Mechanic Card
+  mechanicCard: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    backgroundColor: COLORS.cardWhite,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+    borderRadius: RADIUS.lg,
+    padding: 10,
+    marginBottom: SPACING.six,
   },
-  activityTitle: {
+  mechanicAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: RADIUS.md,
+  },
+  onlineIndicator: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
+    width: 14,
+    height: 14,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.success,
+    borderWidth: 3,
+    borderColor: COLORS.cardWhite,
+  },
+  mechanicInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  mechanicNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  mechanicName: {
     fontSize: 14,
     fontWeight: "800",
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
   },
-  activityStatus: {
-    fontSize: 12,
-    color: COLORS.primary,
-    fontWeight: "700",
+  mechanicTitle: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  mechanicMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 6,
+  },
+  ratingText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: COLORS.textDark,
+  },
+  ratingCountText: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    fontWeight: "400",
+  },
+  distanceText: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+  },
+  mechanicChevronBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.softPurple,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // Membership Banner
+  membershipCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.accentPurple,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.four,
+    gap: 14,
+    marginBottom: SPACING.xl,
+  },
+  membershipTitle: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: COLORS.textLight,
+  },
+  membershipSub: {
+    fontSize: 10,
+    color: "rgba(255, 255, 255, 0.7)",
+    textDecorationLine: "underline",
+    marginTop: 4,
   },
 });
