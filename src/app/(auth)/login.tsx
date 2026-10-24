@@ -1,18 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { COLORS } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { styles } from "../../styles/login.styles";
+import { getErrorMessage } from "../../utils/errors";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -31,10 +32,8 @@ export default function LoginScreen() {
     setSubmitting(true);
     try {
       await login(email.trim(), password);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message || "Invalid email or password.";
-      Alert.alert("Login Failed", message);
+    } catch (error) {
+      Alert.alert("Login failed", getErrorMessage(error));
     } finally {
       setSubmitting(false);
     }

@@ -1,13 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { styles } from "../../styles/home.styles";
