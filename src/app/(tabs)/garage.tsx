@@ -1,10 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, RADIUS, SPACING } from "../../constants/theme";
+import { COLORS } from "../../constants/theme";
+import { garageStyles } from "../../styles/garage.styles";
 
 export default function GarageScreen() {
   const healthItems = [
-    { name: "Engine Oil", health: 85, status: "Good", color: COLORS.success },
+    {
+      name: "Engine Oil",
+      health: 85,
+      status: "Good",
+      color: COLORS.success,
+    },
     {
       name: "CVT Belt & Rollers",
       health: 45,
@@ -26,88 +32,44 @@ export default function GarageScreen() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bgDark }}>
-      <ScrollView
-        contentContainerStyle={{ padding: SPACING.md, paddingTop: 50 }}
-      >
-        <Text
-          style={{
-            fontSize: 22,
-            fontWeight: "900",
-            color: "#FFF",
-            marginBottom: 4,
-          }}
-        >
-          🏍️ My Garage
-        </Text>
-        <Text
-          style={{
-            color: COLORS.textSecondary,
-            fontSize: 13,
-            marginBottom: 20,
-          }}
-        >
-          Digital Health History & LTO Butler[cite: 8]
+    <SafeAreaView style={garageStyles.container}>
+      <ScrollView contentContainerStyle={garageStyles.scrollContent}>
+        <Text style={garageStyles.headerTitle}>🏍️ My Garage</Text>
+
+        <Text style={garageStyles.headerSubtitle}>
+          Your motorcycles and maintenance history
         </Text>
 
-        {/* Motorcycle Card */}
         <View style={garageStyles.bikeHeaderCard}>
-          <Text
-            style={{ color: COLORS.primary, fontWeight: "800", fontSize: 12 }}
-          >
-            PRIMARY BIKE
-          </Text>
-          <Text
-            style={{
-              color: "#FFF",
-              fontSize: 20,
-              fontWeight: "900",
-              marginTop: 2,
-            }}
-          >
-            Yamaha NMAX 155 (2023)
-          </Text>
-          <Text
-            style={{ color: COLORS.textSecondary, fontSize: 13, marginTop: 2 }}
-          >
+          <Text style={garageStyles.primaryBikeLabel}>PRIMARY BIKE</Text>
+
+          <Text style={garageStyles.bikeName}>Yamaha NMAX 155 (2023)</Text>
+
+          <Text style={garageStyles.bikeDetails}>
             Plate: ABC 1234 • Odometer: 12,450 km
           </Text>
         </View>
 
-        {/* Health Meters */}
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: "800",
-            color: "#FFF",
-            marginBottom: 12,
-          }}
-        >
-          Parts Health Index
-        </Text>
-        {healthItems.map((item, index) => (
-          <View key={index} style={garageStyles.healthCard}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 6,
-              }}
-            >
-              <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 14 }}>
-                {item.name}
-              </Text>
-              <Text
-                style={{ color: item.color, fontWeight: "800", fontSize: 13 }}
-              >
+        <Text style={garageStyles.sectionTitle}>Parts Health Index</Text>
+
+        {healthItems.map((item) => (
+          <View key={item.name} style={garageStyles.healthCard}>
+            <View style={garageStyles.healthRow}>
+              <Text style={garageStyles.healthName}>{item.name}</Text>
+
+              <Text style={[garageStyles.healthStatus, { color: item.color }]}>
                 {item.health}% ({item.status})
               </Text>
             </View>
+
             <View style={garageStyles.trackBar}>
               <View
                 style={[
                   garageStyles.fillBar,
-                  { width: `${item.health}%`, backgroundColor: item.color },
+                  {
+                    width: `${item.health}%`,
+                    backgroundColor: item.color,
+                  },
                 ]}
               />
             </View>
@@ -117,32 +79,3 @@ export default function GarageScreen() {
     </SafeAreaView>
   );
 }
-
-const garageStyles = StyleSheet.create({
-  bikeHeaderCard: {
-    backgroundColor: COLORS.cardDark,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
-    marginBottom: SPACING.lg,
-  },
-  healthCard: {
-    backgroundColor: COLORS.cardDark,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
-  },
-  trackBar: {
-    height: 8,
-    backgroundColor: "#121212",
-    borderRadius: RADIUS.full,
-    overflow: "hidden",
-  },
-  fillBar: {
-    height: "100%",
-    borderRadius: RADIUS.full,
-  },
-});
