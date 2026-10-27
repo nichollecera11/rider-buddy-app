@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -45,13 +46,15 @@ export default function LoginScreen() {
       style={styles.container}
     >
       <View style={styles.brandContainer}>
-        <View style={styles.logoBadge}>
-          <Ionicons name="bicycle-outline" size={42} color={COLORS.primary} />
+        <View>
+          <Image
+            source={require("../../../assets/images/rider_buddy_temp.png")}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
         <Text style={styles.brandTitle}>RIDER BUDDY</Text>
-        <Text style={styles.brandTagline}>
-          Kaluwasan ug Transparency sa Dalan
-        </Text>
+        <Text style={styles.brandTagline}>Kasama Mo sa Bawat Biyahe.</Text>
       </View>
 
       <View style={styles.card}>
@@ -65,7 +68,7 @@ export default function LoginScreen() {
           />
           <TextInput
             style={styles.input}
-            placeholder="authtest1@example.com"
+            placeholder="yourname@example.com"
             placeholderTextColor={COLORS.textMuted}
             value={email}
             onChangeText={setEmail}
@@ -105,7 +108,7 @@ export default function LoginScreen() {
           disabled={submitting}
         >
           {submitting ? (
-            <ActivityIndicator color={COLORS.textPrimary} />
+            <ActivityIndicator color={COLORS.darkBg} />
           ) : (
             <Text style={styles.loginBtnText}>SIGN IN</Text>
           )}

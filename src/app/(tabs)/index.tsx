@@ -1,14 +1,119 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import api from "../../api/client";
 import { COLORS } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { styles } from "../../styles/home.styles";
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const router = useRouter();
+
+  const [motorcycles, setMotorcycles] = useState<any[]>([]);
+  const [mechanics, setMechanics] = useState<any[]>([]);
+  const [selectedMotorcycleId, setSelectedMotorcycleId] = useState<
+    number | null
+  >(null);
+
+  const [loadingGarage, setLoadingGarage] = useState(true);
+  const [loadingMechanics, setLoadingMechanics] = useState(true);
   const [selectedService, setSelectedService] = useState("Roadside");
+
+  const selectedMotorcycle = motorcycles.find(
+    (motorcycle) => motorcycle.id === selectedMotorcycleId,
+  );
+  // Prefer a mechanic who is both verified and available.
+  // This does NOT mean they are the nearest mechanic.
+  const featuredMechanic =
+    mechanics.find(
+      (mechanic) =>
+        mechanic.is_verified === true && mechanic.is_available === true,
+    ) ??
+    mechanics.find((mechanic) => mechanic.is_available === true) ??
+    mechanics[0] ??
+    null;
+
+  const formatPeso = (amount: string | number | null | undefined) => {
+    if (amount === null || amount === undefined || amount === "") {
+      return "Fee not listed";
+    }
+
+    const value = Number(amount);
+
+    if (!Number.isFinite(value)) {
+      return "Fee not listed";
+    }
+
+    return `₱${value.toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+  //homestyle
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHomeData = async () => {
+      try {
+        const [garageResult, mechanicsResult] = await Promise.allSettled([
+          api.get("/user-motorcycles"),
+          api.get("/mechanics", {
+            params: { page: 1 },
+          }),
+        ]);
+
+        if (!isMounted) return;
+
+        if (garageResult.status === "fulfilled") {
+          const response = garageResult.value.data;
+
+          const items = Array.isArray(response.data) ? response.data : [];
+
+          setMotorcycles(items);
+
+          const mainMotorcycle = items.find(
+            (motorcycle: any) =>
+              motorcycle.is_main === 1 || motorcycle.is_main === true,
+          );
+
+          if (mainMotorcycle) {
+            setSelectedMotorcycleId(mainMotorcycle.id);
+          } else if (items.length > 0) {
+            setSelectedMotorcycleId(items[0].id);
+          }
+        } else {
+          console.warn("Could not load garage:", garageResult.reason);
+        }
+
+        if (mechanicsResult.status === "fulfilled") {
+          const response = mechanicsResult.value.data;
+          const items = Array.isArray(response.data)
+            ? response.data
+            : Array.isArray(response.data?.data)
+              ? response.data.data
+              : [];
+
+          setMechanics(items);
+        } else {
+          console.warn("Could not load mechanics:", mechanicsResult.reason);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingGarage(false);
+          setLoadingMechanics(false);
+        }
+      }
+    };
+
+    loadHomeData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const services = [
     {
@@ -42,8 +147,12 @@ export default function HomeScreen() {
       {/* Top Navigation Header */}
       <View style={styles.header}>
         <View style={styles.logoGroup}>
-          <View style={styles.logoIconBadge}>
-            <Ionicons name="build" size={18} color={COLORS.darkBg} />
+          <View>
+            <Image
+              source={require("../../../assets/images/rider_buddy_temp.png")}
+              style={styles.logoImage}
+              resizeMode="cover"
+            />
           </View>
           <Text style={styles.logoText}>RIDER BUDDY</Text>
         </View>
@@ -102,9 +211,28 @@ export default function HomeScreen() {
                 <Ionicons name="car" size={14} color={COLORS.primary} />
                 <Text style={styles.vehicleEyebrowText}>YOUR VEHICLE</Text>
               </View>
-              <Text style={styles.vehicleTitle}>Yamaha NMAX 155</Text>
+              <Text style={styles.vehicleTitle}>
+                {loadingGarage
+                  ? "Loading your motorcycle..."
+                  : selectedMotorcycle
+                    ? `${selectedMotorcycle.brand?.name ?? "Motorcycle"} ${selectedMotorcycle.model}`
+                    : "No motorcycle registered"}
+              </Text>
+
               <Text style={styles.vehicleSubtitle}>
-                2023 · 155cc VVA · NCG 4832
+                {selectedMotorcycle
+                  ? [
+                      selectedMotorcycle.year_model,
+                      selectedMotorcycle.engine_capacity
+                        ? `${selectedMotorcycle.engine_capacity}cc`
+                        : null,
+                      selectedMotorcycle.plate_number,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")
+                  : loadingGarage
+                    ? "Fetching your garage"
+                    : "Add a motorcycle to get started"}
               </Text>
             </View>
             <TouchableOpacity style={styles.switchBtn}>
@@ -115,29 +243,38 @@ export default function HomeScreen() {
           <View style={styles.vehicleCardDivider} />
 
           <View style={styles.vehicleCardBottom}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <View style={styles.healthBadge}>
-                <Text style={styles.healthScoreText}>92</Text>
-              </View>
-              <View>
-                <Text style={styles.healthLabelTitle}>Vehicle health</Text>
-                <Text style={styles.healthLabelSub}>Everything looks good</Text>
-              </View>
-            </View>
-
-            <View style={styles.checkedBadge}>
+            <View style={styles.garagePrompt}>
               <Ionicons
-                name="shield-checkmark"
-                size={14}
+                name="bicycle-outline"
+                size={22}
                 color={COLORS.primary}
+                style={{ marginRight: 10 }}
               />
-              <Text style={styles.checkedText}>Checked</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.garagePromptTitle}>
+                  {motorcycles.length} registered motorcycle
+                  {motorcycles.length === 1 ? "" : "s"}
+                </Text>
+                <Text style={styles.garagePromptSubtitle}>
+                  Manage your vehicles in your garage
+                </Text>
+              </View>
             </View>
+            <TouchableOpacity
+              style={styles.switchBtn}
+              onPress={() => router.push("/(tabs)/garage")}
+            >
+              <Text style={styles.switchBtnText}>My garage</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* Quick Emergency Dispatch Banner */}
-        <TouchableOpacity style={styles.dispatchCard}>
+        <TouchableOpacity
+          style={styles.dispatchCard}
+          activeOpacity={0.85}
+          onPress={() => router.push("/(tabs)/consults")}
+        >
           <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
             <View style={styles.dispatchIconBox}>
               <Ionicons name="flash" size={22} color={COLORS.darkBg} />
@@ -202,66 +339,122 @@ export default function HomeScreen() {
         </View>
 
         {/* Top Mechanic Nearby Section */}
+
+        {/* Live Mechanic Preview */}
         <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionEyebrow}>rIDER BUDDY VERIFIED</Text>
-            <Text style={styles.sectionTitleText}>Top mechanic nearby</Text>
+            <Text style={styles.sectionEyebrow}>RIDER BUDDY MECHANICS</Text>
+            <Text style={styles.sectionTitleText}>Meet a mechanic</Text>
           </View>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Text style={styles.actionBtnText}>See map</Text>
-            <Ionicons
-              name="chevron-forward"
-              size={14}
-              color={COLORS.accentPurple}
-            />
-          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.mechanicCard}>
-          <View style={{ position: "relative" }}>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=faces&cs=tinysrgb&fit=crop&fm=jpg&h=220&ixlib=rb-4.1.0&q=85&w=220",
-              }}
-              style={styles.mechanicAvatar}
-            />
-            <View style={styles.onlineIndicator} />
+        {loadingMechanics ? (
+          <View style={styles.mechanicEmpty}>
+            <Text style={styles.mechanicEmptyText}>Finding mechanics...</Text>
           </View>
-
-          <View style={styles.mechanicInfo}>
-            <View style={styles.mechanicNameRow}>
-              <Text style={styles.mechanicName}>Carlo Mendoza</Text>
-              <Ionicons
-                name="shield-checkmark"
-                size={14}
-                color={COLORS.accentPurple}
-              />
-            </View>
-            <Text style={styles.mechanicTitle}>
-              ASE-certified master mechanic
-            </Text>
-
-            <View style={styles.mechanicMetaRow}>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 2 }}
-              >
-                <Ionicons name="star" size={12} color={COLORS.warning} />
-                <Text style={styles.ratingText}>
-                  4.9 <Text style={styles.ratingCountText}>(238)</Text>
-                </Text>
-              </View>
-              <Text style={styles.distanceText}>• 📍 1.2 km</Text>
-            </View>
-          </View>
-
-          <View style={styles.mechanicChevronBtn}>
+        ) : mechanics.length === 0 ? (
+          <View style={styles.mechanicEmpty}>
             <Ionicons
-              name="chevron-forward"
-              size={16}
-              color={COLORS.accentPurple}
+              name="construct-outline"
+              size={28}
+              color={COLORS.textMuted}
             />
+            <Text style={styles.mechanicEmptyTitle}>
+              No mechanics to display yet
+            </Text>
+            <Text style={styles.mechanicEmptyText}>
+              Please try again later.
+            </Text>
           </View>
-        </TouchableOpacity>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.mechanicCarouselContent}
+          >
+            {mechanics.map((mechanic) => {
+              const isAvailable =
+                mechanic.is_available === true || mechanic.is_available === 1;
+
+              const isVerified =
+                mechanic.is_verified === true || mechanic.is_verified === 1;
+
+              return (
+                <View key={mechanic.id} style={styles.mechanicCard}>
+                  <View style={styles.mechanicAvatarPlaceholder}>
+                    <Ionicons
+                      name="construct"
+                      size={30}
+                      color={COLORS.accentPurple}
+                    />
+                    {isAvailable && <View style={styles.onlineIndicator} />}
+                  </View>
+
+                  <View style={styles.mechanicInfo}>
+                    <View style={styles.mechanicNameRow}>
+                      <Text style={styles.mechanicName} numberOfLines={1}>
+                        {mechanic.shop_name || mechanic.name}
+                      </Text>
+
+                      {isVerified && (
+                        <Ionicons
+                          name="shield-checkmark"
+                          size={15}
+                          color={COLORS.success}
+                        />
+                      )}
+                    </View>
+
+                    <Text style={styles.mechanicTitle} numberOfLines={1}>
+                      {mechanic.specialization || "General mechanic"}
+                    </Text>
+
+                    {mechanic.years_experience != null && (
+                      <Text style={styles.mechanicExperience}>
+                        {mechanic.years_experience} years experience
+                      </Text>
+                    )}
+
+                    <View
+                      style={[
+                        styles.mechanicStatusPill,
+                        isAvailable
+                          ? styles.mechanicStatusAvailable
+                          : styles.mechanicStatusUnavailable,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.mechanicStatusText,
+                          isAvailable
+                            ? styles.mechanicStatusTextAvailable
+                            : styles.mechanicStatusTextUnavailable,
+                        ]}
+                      >
+                        {isAvailable ? "Available" : "Unavailable"}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.mechanicFeeLabel}>Diagnostic fee</Text>
+                    <Text style={styles.mechanicFee}>
+                      {formatPeso(mechanic.diagnostic_fee_base)}
+                    </Text>
+                  </View>
+
+                  {isVerified && (
+                    <View style={styles.mechanicVerifiedMark}>
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={18}
+                        color={COLORS.success}
+                      />
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </ScrollView>
+        )}
 
         {/* Care Plan Banner */}
         <TouchableOpacity style={styles.membershipCard}>

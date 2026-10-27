@@ -17,8 +17,8 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: SPACING.four,
-    paddingVertical: SPACING.three,
+    paddingHorizontal: SPACING.three,
+    paddingVertical: SPACING.one,
     backgroundColor: COLORS.bgLight,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.borderLight,
@@ -116,7 +116,7 @@ export const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   greetingTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "900",
     color: COLORS.textDark,
     letterSpacing: -0.5,
@@ -149,7 +149,7 @@ export const styles = StyleSheet.create({
   vehicleCard: {
     backgroundColor: COLORS.darkBg,
     borderRadius: RADIUS.xl,
-    padding: SPACING.five,
+    padding: SPACING.four,
     marginBottom: SPACING.three,
   },
   vehicleCardTop: {
@@ -331,7 +331,7 @@ export const styles = StyleSheet.create({
   },
   serviceCard: {
     width: "48.5%",
-    minHeight: 135,
+    minHeight: 125,
     backgroundColor: COLORS.cardWhite,
     borderWidth: 1,
     borderColor: COLORS.borderLight,
@@ -367,14 +367,17 @@ export const styles = StyleSheet.create({
 
   // Mechanic Card
   mechanicCard: {
+    width: 340,
+    minHeight: 170,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     backgroundColor: COLORS.cardWhite,
     borderWidth: 1,
     borderColor: COLORS.borderLight,
     borderRadius: RADIUS.lg,
-    padding: 10,
-    marginBottom: SPACING.six,
+    padding: SPACING.six,
+    gap: SPACING.three,
+    margin: 5,
   },
   mechanicAvatar: {
     width: 68,
@@ -394,7 +397,12 @@ export const styles = StyleSheet.create({
   },
   mechanicInfo: {
     flex: 1,
-    marginLeft: 12,
+    minWidth: 0,
+  },
+  mechanicVerifiedMark: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
   },
   mechanicNameRow: {
     flexDirection: "row",
@@ -449,6 +457,7 @@ export const styles = StyleSheet.create({
     padding: SPACING.four,
     gap: 14,
     marginBottom: SPACING.xl,
+    marginTop: 10,
   },
   membershipTitle: {
     fontSize: 13,
@@ -460,5 +469,27 @@ export const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.7)",
     textDecorationLine: "underline",
     marginTop: 4,
+  },
+
+  garagePrompt: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  garagePromptTitle: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: COLORS.textLight,
+  },
+  garagePromptSubtitle: {
+    fontSize: 10,
+    color: "rgba(255, 255, 255, 0.65)",
+    marginTop: 3,
+  },
+  logoImage: {
+    width: 60,
+    height: 60,
+    resizeMode: "cover",
+    marginBottom: SPACING.xs,
   },
 });
