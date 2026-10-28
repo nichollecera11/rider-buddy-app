@@ -25,14 +25,20 @@ export const COLORS = {
   // Light / Dark Fallbacks
   light: {
     text: "#18161B",
+    textSecondary: "#77717C",
     background: "#FBFAF8",
+    backgroundElement: "#FFFFFF",
+    backgroundSelected: "#F2EAF7",
     tint: "#4C246B",
     tabIconDefault: "#99949D",
     tabIconSelected: "#4C246B",
   },
   dark: {
     text: "#FFFFFF",
+    textSecondary: "#BDB5C5",
     background: "#281137",
+    backgroundSelected: "#4C246B",
+    backgroundElement: "#4C246B",
     tint: "#FFD629",
     tabIconDefault: "#77717C",
     tabIconSelected: "#FFD629",
@@ -42,6 +48,7 @@ export const COLORS = {
 export const Colors = COLORS;
 
 export const SPACING = {
+  half: 2,
   xs: 4,
   sm: 8,
   md: 16,
@@ -99,3 +106,8 @@ export default {
   Fonts,
   fonts,
 };
+
+export type ThemeColor = keyof typeof Colors.light;
+
+export const BottomTabInset = 80;
+export const MaxContentWidth = 1200;

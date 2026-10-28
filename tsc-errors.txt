@@ -1,0 +1,9 @@
+﻿src/components/app-tabs.web.tsx(42,6): error TS2322: Type '{ children: Element; style: ({ pressed }: PressableStateCallbackType) => false | { opacity: number; }; pointerEvents?: "auto" | "none" | "box-none" | "box-only" | undefined; ... 130 more ...; href?: string | undefined; }' is not assignable to type '{ ref?: Ref<ReactNativeElement> | undefined; }'.
+  Types of property 'ref' are incompatible.
+    Type 'Ref<(props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }) => ReactNode> | undefined' is not assignable to type 'Ref<ReactNativeElement> | undefined'.
+      Type '(instance: ((props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }) => ReactNode) | null) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<ReactNativeElement> | undefined'.
+        Type '(instance: ((props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }) => ReactNode) | null) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: ReactNativeElement | null) => void | (() => VoidOrUndefinedOnly)'.
+          Types of parameters 'instance' and 'instance' are incompatible.
+            Type 'ReactNativeElement | null' is not assignable to type '((props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }) => ReactNode) | null'.
+              Type 'ReactNativeElement' is not assignable to type '(props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }) => ReactNode'.
+                Type 'ReactNativeElement' provides no match for the signature '(props: Omit<ViewProps, "ref"> & { ref?: Ref<ReactNativeElement> | undefined; }): ReactNode'.

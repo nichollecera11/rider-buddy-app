@@ -4,7 +4,7 @@ import { COLORS, RADIUS, SPACING } from "../constants/theme";
 export const garageStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bgDark,
+    backgroundColor: COLORS.darkBg,
   },
 
   scrollContent: {
@@ -16,22 +16,22 @@ export const garageStyles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "900",
-    color: COLORS.textPrimary,
+    color: COLORS.textLight,
     marginBottom: SPACING.xs,
   },
 
   headerSubtitle: {
-    color: COLORS.textSecondary,
+    color: COLORS.textMuted,
     fontSize: 13,
     marginBottom: SPACING.lg,
   },
 
   bikeHeaderCard: {
-    backgroundColor: COLORS.cardDark,
+    backgroundColor: COLORS.accentPurple,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    borderColor: COLORS.borderLight,
     marginBottom: SPACING.xl,
   },
 
@@ -44,14 +44,14 @@ export const garageStyles = StyleSheet.create({
   },
 
   bikeName: {
-    color: COLORS.textPrimary,
+    color: COLORS.textLight,
     fontSize: 20,
     fontWeight: "900",
     marginTop: SPACING.xs,
   },
 
   bikeDetails: {
-    color: COLORS.textSecondary,
+    color: COLORS.textLight,
     fontSize: 13,
     marginTop: SPACING.xs,
   },
@@ -59,17 +59,17 @@ export const garageStyles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "800",
-    color: COLORS.textPrimary,
+    color: COLORS.textLight,
     marginBottom: SPACING.md,
   },
 
   healthCard: {
-    backgroundColor: COLORS.cardDark,
+    backgroundColor: COLORS.accentPurple,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    borderColor: COLORS.borderLight,
   },
 
   healthRow: {
@@ -81,7 +81,7 @@ export const garageStyles = StyleSheet.create({
   },
 
   healthName: {
-    color: COLORS.textPrimary,
+    color: COLORS.textLight,
     fontWeight: "700",
     fontSize: 14,
     flex: 1,
@@ -95,7 +95,7 @@ export const garageStyles = StyleSheet.create({
 
   trackBar: {
     height: 8,
-    backgroundColor: "#121212",
+    backgroundColor: COLORS.darkBg,
     borderRadius: RADIUS.full,
     overflow: "hidden",
   },

@@ -7,7 +7,7 @@ export default function ShopScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: COLORS.bgDark,
+        backgroundColor: COLORS.darkBg,
         justifyContent: "center",
         alignItems: "center",
       }}

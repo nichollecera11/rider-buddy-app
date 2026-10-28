@@ -58,7 +58,7 @@ function RootLayoutNav() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: COLORS.bgDark },
+        contentStyle: { backgroundColor: COLORS.darkBg },
       }}
     />
   );

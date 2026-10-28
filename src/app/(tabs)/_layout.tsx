@@ -30,7 +30,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? "home" : "home-outline"}
               size={22}
-              color={color}
+              color={String(color ?? "#77717C")}
             />
           ),
         }}
@@ -43,7 +43,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? "calendar" : "calendar-outline"}
               size={22}
-              color={color}
+              color={String(color ?? "#77717C")}
             />
           ),
         }}
@@ -56,7 +56,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? "chatbubble" : "chatbubble-outline"}
               size={22}
-              color={color}
+              color={String(color ?? "#77717C")}
             />
           ),
         }}
@@ -69,7 +69,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? "person" : "person-outline"}
               size={22}
-              color={color}
+              color={String(color ?? "#77717C")}
             />
           ),
         }}

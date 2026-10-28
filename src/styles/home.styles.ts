@@ -439,13 +439,84 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     color: COLORS.textMuted,
   },
-  mechanicChevronBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: RADIUS.full,
+
+  // Mechanic Loading and Empty States
+  mechanicEmpty: {
+    minHeight: 130,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: SPACING.four,
+    backgroundColor: COLORS.cardWhite,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+    borderRadius: RADIUS.lg,
+    marginVertical: SPACING.two,
+  },
+  mechanicEmptyTitle: {
+    color: COLORS.textDark,
+    fontSize: 14,
+    fontWeight: "800",
+    textAlign: "center",
+    marginBottom: SPACING.xs,
+  },
+  mechanicEmptyText: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  mechanicCarouselContent: {
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.one,
+  },
+  mechanicAvatarPlaceholder: {
+    width: 68,
+    height: 68,
+    borderRadius: RADIUS.md,
     backgroundColor: COLORS.softPurple,
     alignItems: "center",
     justifyContent: "center",
+  },
+  mechanicExperience: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    marginTop: SPACING.xs,
+  },
+  mechanicStatusPill: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: SPACING.two,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.full,
+    marginTop: SPACING.sm,
+  },
+  mechanicStatusAvailable: {
+    backgroundColor: COLORS.successBg,
+  },
+  mechanicStatusUnavailable: {
+    backgroundColor: "#F3F0F3",
+  },
+  mechanicStatusText: {
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  mechanicStatusTextAvailable: {
+    color: COLORS.success,
+  },
+  mechanicStatusTextUnavailable: {
+    color: COLORS.textMuted,
+  },
+  mechanicFeeLabel: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    marginTop: SPACING.sm,
+  },
+  mechanicFee: {
+    color: COLORS.accentPurple,
+    fontSize: 14,
+    fontWeight: "900",
+    marginTop: 2,
   },
 
   // Membership Banner

@@ -4,7 +4,7 @@ import { COLORS, RADIUS, SPACING } from "../constants/theme";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bgDark,
+    backgroundColor: COLORS.darkBg,
   },
   scrollContent: {
     paddingHorizontal: SPACING.md,
@@ -20,18 +20,18 @@ export const styles = StyleSheet.create({
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.cardDark,
+    backgroundColor: COLORS.accentPurple,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    borderColor: COLORS.borderLight,
     marginBottom: SPACING.lg,
   },
   avatarBox: {
     width: 60,
     height: 60,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.inputDark,
+    backgroundColor: COLORS.darkBg,
     alignItems: "center",
     justifyContent: "center",
     marginRight: SPACING.md,
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     fontWeight: "800",
   },
   userEmail: {
-    color: COLORS.textSecondary,
+    color: COLORS.textMuted,
     fontSize: 13,
     marginTop: 2,
   },
@@ -60,21 +60,21 @@ export const styles = StyleSheet.create({
     marginTop: 6,
   },
   badgeText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 10,
     fontWeight: "800",
   },
   sectionTitle: {
-    color: COLORS.textPrimary,
+    color: COLORS.textLight,
     fontSize: 15,
     fontWeight: "800",
     marginBottom: SPACING.sm,
   },
   menuGroup: {
-    backgroundColor: COLORS.cardDark,
+    backgroundColor: COLORS.accentPurple,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
+    borderColor: COLORS.borderLight,
     marginBottom: SPACING.xl,
   },
   menuItem: {
@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderDark,
+    borderBottomColor: COLORS.borderLight,
   },
   menuLeft: {
     flexDirection: "row",
