@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -82,6 +82,7 @@ export default function ConsultsScreen() {
 
   const [issueDescription, setIssueDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submissionLock = useRef(false);
   const [activeConsultation, setActiveConsultation] =
     useState<SOSConsultation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -165,7 +166,7 @@ export default function ConsultsScreen() {
   }, [loadMotorcycles]);
 
   const handleFindAssistance = async () => {
-    if (isSubmitting) return;
+    if (submissionLock.current) return;
 
     if (selectedMotorcycleId === null) {
       Alert.alert(
@@ -188,6 +189,7 @@ export default function ConsultsScreen() {
       return;
     }
 
+    submissionLock.current = true;
     setIsSubmitting(true);
 
     try {
@@ -201,8 +203,6 @@ export default function ConsultsScreen() {
       const consultation = response.data.data as SOSConsultation;
 
       setActiveConsultation(consultation);
-
-      console.log("SOS consultation created:", consultation);
 
       Alert.alert(
         "SOS request submitted",
@@ -220,6 +220,7 @@ export default function ConsultsScreen() {
 
       Alert.alert("Request failed", message);
     } finally {
+      submissionLock.current = false;
       setIsSubmitting(false);
     }
   };

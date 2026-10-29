@@ -11,93 +11,98 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import api from "../../api/client";
 import { COLORS } from "../../constants/theme";
 import { useAuth } from "../../context/AuthContext";
 import { styles } from "../../styles/home.styles";
 
+type Motorcycle = {
+  id: number;
+  brand?: { name?: string } | null;
+  model?: string | null;
+  year_model?: string | number | null;
+  engine_capacity?: string | number | null;
+  plate_number?: string | null;
+  is_main?: boolean | number;
+};
+
+type Mechanic = {
+  id: number;
+  name?: string;
+  shop_name?: string | null;
+  specialization?: string | null;
+  years_experience?: number | null;
+  diagnostic_fee_base?: string | number | null;
+  is_available?: boolean | number;
+  is_verified?: boolean | number;
+};
+
 export default function HomeScreen() {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [motorcycles, setMotorcycles] = useState<any[]>([]);
-  const [mechanics, setMechanics] = useState<any[]>([]);
+  const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
+  const [mechanics, setMechanics] = useState<Mechanic[]>([]);
   const [selectedMotorcycleId, setSelectedMotorcycleId] = useState<
     number | null
   >(null);
 
   const [loadingGarage, setLoadingGarage] = useState(true);
   const [loadingMechanics, setLoadingMechanics] = useState(true);
-  const [selectedService, setSelectedService] = useState("Roadside");
-
-  // Sidebar / Drawer state
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const selectedMotorcycle = motorcycles.find(
     (motorcycle) => motorcycle.id === selectedMotorcycleId,
   );
 
-  const formatPeso = (amount: string | number | null | undefined) => {
-    if (amount === null || amount === undefined || amount === "") {
-      return "Fee not listed";
-    }
-    const value = Number(amount);
-    if (!Number.isFinite(value)) {
-      return "Fee not listed";
-    }
-    return `₱${value.toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
   useEffect(() => {
     let isMounted = true;
 
-    const loadHomeData = async () => {
+    async function loadHomeData() {
       try {
         const [garageResult, mechanicsResult] = await Promise.allSettled([
           api.get("/user-motorcycles"),
-          api.get("/mechanics", {
-            params: { page: 1 },
-          }),
+          api.get("/mechanics", { params: { page: 1 } }),
         ]);
 
         if (!isMounted) return;
 
         if (garageResult.status === "fulfilled") {
           const response = garageResult.value.data;
-          const items = Array.isArray(response.data) ? response.data : [];
+          const items: Motorcycle[] = Array.isArray(response.data)
+            ? response.data
+            : [];
+
           setMotorcycles(items);
 
           const mainMotorcycle = items.find(
-            (motorcycle: any) =>
-              motorcycle.is_main === 1 || motorcycle.is_main === true,
+            (motorcycle) =>
+              motorcycle.is_main === true || motorcycle.is_main === 1,
           );
 
-          if (mainMotorcycle) {
-            setSelectedMotorcycleId(mainMotorcycle.id);
-          } else if (items.length > 0) {
-            setSelectedMotorcycleId(items[0].id);
-          }
+          setSelectedMotorcycleId(mainMotorcycle?.id ?? items[0]?.id ?? null);
         }
 
         if (mechanicsResult.status === "fulfilled") {
           const response = mechanicsResult.value.data;
-          const items = Array.isArray(response.data)
+          const items: Mechanic[] = Array.isArray(response.data)
             ? response.data
             : Array.isArray(response.data?.data)
               ? response.data.data
               : [];
+
           setMechanics(items);
         }
+      } catch (error) {
+        console.error("Unable to load home data:", error);
       } finally {
         if (isMounted) {
           setLoadingGarage(false);
           setLoadingMechanics(false);
         }
       }
-    };
+    }
 
     loadHomeData();
 
@@ -106,70 +111,157 @@ export default function HomeScreen() {
     };
   }, []);
 
+  const formatPeso = (amount: string | number | null | undefined): string => {
+    if (amount === null || amount === undefined || amount === "") {
+      return "Fee not listed";
+    }
+
+    const value = Number(amount);
+
+    if (!Number.isFinite(value)) {
+      return "Fee not listed";
+    }
+
+    return `₱${value.toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  const closeDrawerAndNavigate = (route: string) => {
+    setSidebarVisible(false);
+    router.push(route as any);
+  };
+
+  const switchMotorcycle = () => {
+    if (motorcycles.length < 2) {
+      router.push("/(tabs)/garage");
+      return;
+    }
+
+    const currentIndex = motorcycles.findIndex(
+      (motorcycle) => motorcycle.id === selectedMotorcycleId,
+    );
+
+    const nextIndex = (currentIndex + 1) % motorcycles.length;
+
+    setSelectedMotorcycleId(motorcycles[nextIndex].id);
+  };
+
   const services = [
     {
-      id: "Roadside",
-      label: "Roadside",
-      note: "Mechanic to you",
+      id: "roadside",
+      label: "Roadside help",
+      note: "Get help on the road",
       icon: "build-outline",
     },
     {
-      id: "Maintenance",
+      id: "maintenance",
       label: "Maintenance",
-      note: "Keep it running",
+      note: "Keep your bike running",
       icon: "water-outline",
     },
     {
-      id: "Tire care",
+      id: "tire",
       label: "Tire care",
-      note: "Repair or replace",
+      note: "Tire repair assistance",
       icon: "disc-outline",
     },
     {
-      id: "Tow service",
+      id: "tow",
       label: "Tow service",
-      note: "Move safely",
+      note: "Help moving your bike",
       icon: "car-outline",
+    },
+  ];
+
+  const drawerGroups = [
+    {
+      title: "YOUR RIDER BUDDY",
+      items: [
+        {
+          label: "Home",
+          icon: "home-outline",
+          route: "/(tabs)",
+        },
+        {
+          label: "My Garage",
+          icon: "bicycle-outline",
+          route: "/(tabs)/garage",
+        },
+        {
+          label: "Request roadside help",
+          icon: "flash-outline",
+          route: "/(tabs)/consults",
+        },
+        {
+          label: "Motorcycle marketplace",
+          icon: "storefront-outline",
+          route: "/(tabs)/shop",
+        },
+      ],
+    },
+    {
+      title: "YOUR ACCOUNT",
+      items: [
+        {
+          label: "My Profile",
+          icon: "person-outline",
+          route: "/(tabs)/profile",
+        },
+      ],
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Navigation Header with Hamburger Menu Button */}
+      {/* Header */}
       <View style={styles.header}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
           <TouchableOpacity
+            accessibilityLabel="Open navigation menu"
             onPress={() => setSidebarVisible(true)}
-            style={{ padding: 4 }}
+            style={{ padding: 6 }}
           >
-            <Ionicons name="menu" size={24} color={COLORS.textDark} />
+            <Ionicons name="menu-outline" size={27} color={COLORS.textDark} />
           </TouchableOpacity>
+
           <View style={styles.logoGroup}>
-            <View>
-              <Image
-                source={require("../../../assets/images/rider_buddy_temp.png")}
-                style={styles.logoImage}
-                resizeMode="cover"
-              />
-            </View>
+            <Image
+              source={require("../../../assets/images/rider_buddy_temp.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
             <Text style={styles.logoText}>RIDER BUDDY</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.bellBtn}>
+        <TouchableOpacity
+          accessibilityLabel="Notifications"
+          onPress={() => {
+            // Notifications screen can be connected when implemented.
+          }}
+          style={styles.bellBtn}
+        >
           <Ionicons
             name="notifications-outline"
-            size={20}
+            size={21}
             color={COLORS.textDark}
           />
           <View style={styles.bellDot} />
         </TouchableOpacity>
       </View>
 
-      {/* Slide-out Sidebar / Drawer Navigation Modal */}
+      {/* Light Sidebar */}
       <Modal
         visible={sidebarVisible}
-        transparent={true}
+        transparent
         animationType="fade"
         onRequestClose={() => setSidebarVisible(false)}
       >
@@ -177,233 +269,283 @@ export default function HomeScreen() {
           style={{
             flex: 1,
             flexDirection: "row",
-            backgroundColor: "rgba(0,0,0,0.6)",
+            backgroundColor: "rgba(24,22,27,0.45)",
           }}
         >
-          {/* Sidebar Drawer Container */}
           <View
             style={{
-              width: "75%",
+              width: "82%",
+              maxWidth: 360,
               height: "100%",
-              backgroundColor: COLORS.darkBg,
-              paddingTop: 20,
+              backgroundColor: COLORS.cardWhite,
+              paddingTop: 18,
               paddingHorizontal: 20,
-              justifyContent: "space-between",
+              paddingBottom: 20,
             }}
           >
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {/* User Profile Header inside Sidebar */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ flexGrow: 1 }}
+            >
+              {/* Profile summary */}
               <TouchableOpacity
+                onPress={() => closeDrawerAndNavigate("/(tabs)/profile")}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "space-between",
-                  paddingVertical: 15,
+                  paddingVertical: 18,
                   borderBottomWidth: 1,
-                  borderBottomColor: "rgba(255,255,255,0.1)",
-                  marginBottom: 15,
-                }}
-                onPress={() => {
-                  setSidebarVisible(false);
-                  router.push("/(tabs)/profile");
+                  borderBottomColor: COLORS.borderLight,
+                  marginBottom: 22,
                 }}
               >
                 <View
                   style={{
-                    flexDirection: "row",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: "#FFF3B0",
                     alignItems: "center",
-                    gap: 12,
+                    justifyContent: "center",
+                    marginRight: 12,
                   }}
                 >
-                  <View
+                  <Ionicons
+                    name="person-outline"
+                    size={25}
+                    color={COLORS.accentPurple}
+                  />
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text
+                    numberOfLines={1}
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      backgroundColor: COLORS.primary,
-                      alignItems: "center",
-                      justifyContent: "center",
+                      color: COLORS.textDark,
+                      fontSize: 16,
+                      fontWeight: "800",
                     }}
                   >
-                    <Ionicons name="person" size={24} color={COLORS.darkBg} />
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        color: "#FFF",
-                        fontSize: 16,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {user?.name || "Rider"}
-                    </Text>
-                    <Text style={{ color: COLORS.textMuted, fontSize: 12 }}>
-                      View profile
-                    </Text>
-                  </View>
+                    {user?.name || "Rider"}
+                  </Text>
+
+                  <Text
+                    style={{
+                      color: COLORS.textMuted,
+                      fontSize: 12,
+                      marginTop: 4,
+                    }}
+                  >
+                    View and manage your profile
+                  </Text>
                 </View>
+
                 <Ionicons
                   name="chevron-forward"
-                  size={16}
+                  size={18}
                   color={COLORS.textMuted}
                 />
               </TouchableOpacity>
 
-              {/* Navigation Links */}
-              {[
-                { label: "City", icon: "car-sport-outline", route: "/(tabs)" },
-                {
-                  label: "Request history",
-                  icon: "time-outline",
-                  route: "/(tabs)/consults",
-                },
-                {
-                  label: "Notifications",
-                  icon: "notifications-outline",
-                  route: "/(tabs)",
-                },
-                { label: "Safety", icon: "shield-outline", route: "/(tabs)" },
-                {
-                  label: "Settings",
-                  icon: "settings-outline",
-                  route: "/(tabs)",
-                },
-                {
-                  label: "Help",
-                  icon: "help-circle-outline",
-                  route: "/(tabs)",
-                },
-                {
-                  label: "Support",
-                  icon: "chatbubble-outline",
-                  route: "/(tabs)",
-                },
-                {
-                  label: "Social discount",
-                  icon: "pricetag-outline",
-                  route: "/(tabs)",
-                },
-              ].map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 16,
-                    paddingVertical: 14,
-                  }}
-                  onPress={() => {
-                    setSidebarVisible(false);
-                    if (item.route) router.push(item.route as any);
-                  }}
-                >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={20}
-                    color={COLORS.textDark}
-                  />
+              {/* Navigation groups */}
+              {drawerGroups.map((group) => (
+                <View key={group.title} style={{ marginBottom: 24 }}>
                   <Text
                     style={{
-                      color: COLORS.textDark,
-                      fontSize: 15,
-                      fontWeight: "500",
+                      color: COLORS.textMuted,
+                      fontSize: 10,
+                      fontWeight: "800",
+                      letterSpacing: 1.2,
+                      marginBottom: 10,
                     }}
                   >
-                    {item.label}
+                    {group.title}
                   </Text>
-                </TouchableOpacity>
+
+                  {group.items.map((item) => (
+                    <TouchableOpacity
+                      key={item.label}
+                      onPress={() => closeDrawerAndNavigate(item.route)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingVertical: 14,
+                        paddingHorizontal: 12,
+                        marginBottom: 4,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={21}
+                        color={COLORS.accentPurple}
+                      />
+
+                      <Text
+                        style={{
+                          color: COLORS.textDark,
+                          fontSize: 14,
+                          fontWeight: "600",
+                          marginLeft: 14,
+                          flex: 1,
+                        }}
+                      >
+                        {item.label}
+                      </Text>
+
+                      <Ionicons
+                        name="chevron-forward"
+                        size={15}
+                        color={COLORS.textMuted}
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
               ))}
+
+              {/* Small brand card */}
+              <View
+                style={{
+                  backgroundColor: "#FFF8D9",
+                  borderRadius: 16,
+                  padding: 16,
+                  marginTop: "auto",
+                  marginBottom: 18,
+                }}
+              >
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={25}
+                  color={COLORS.accentPurple}
+                />
+
+                <Text
+                  style={{
+                    color: COLORS.textDark,
+                    fontSize: 14,
+                    fontWeight: "800",
+                    marginTop: 10,
+                  }}
+                >
+                  Ride with confidence
+                </Text>
+
+                <Text
+                  style={{
+                    color: COLORS.textMuted,
+                    fontSize: 12,
+                    lineHeight: 18,
+                    marginTop: 4,
+                  }}
+                >
+                  Keep your motorcycle details updated and know where to find
+                  roadside assistance.
+                </Text>
+              </View>
             </ScrollView>
 
-            {/* Bottom Actions inside Sidebar */}
             <View
               style={{
-                paddingBottom: 30,
-                paddingTop: 15,
                 borderTopWidth: 1,
-                borderTopColor: "rgba(255,255,255,0.1)",
+                borderTopColor: COLORS.borderLight,
+                paddingTop: 14,
               }}
             >
               <TouchableOpacity
-                style={{
-                  backgroundColor: COLORS.primary,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  alignItems: "center",
-                  marginBottom: 15,
-                }}
                 onPress={() => setSidebarVisible(false)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: 12,
+                }}
               >
+                <Ionicons
+                  name="close-outline"
+                  size={20}
+                  color={COLORS.textMuted}
+                />
                 <Text
                   style={{
-                    color: COLORS.darkBg,
-                    fontWeight: "bold",
-                    fontSize: 14,
+                    color: COLORS.textMuted,
+                    fontSize: 13,
+                    fontWeight: "700",
+                    marginLeft: 8,
                   }}
                 >
-                  Driver mode
+                  Close menu
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Backdrop Tap to Close */}
           <Pressable
             style={{ flex: 1 }}
+            accessibilityLabel="Close navigation menu"
             onPress={() => setSidebarVisible(false)}
           />
         </View>
       </Modal>
 
+      {/* Home content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Location Selector */}
+        {/* Location placeholder - no invented city */}
         <View style={styles.locationRow}>
           <View style={styles.locationIconBox}>
-            <Ionicons name="location" size={18} color={COLORS.accentPurple} />
+            <Ionicons
+              name="location-outline"
+              size={18}
+              color={COLORS.accentPurple}
+            />
           </View>
+
           <View>
             <Text style={styles.locationEyebrow}>SERVICE LOCATION</Text>
-            <TouchableOpacity style={styles.locationBtn}>
-              <Text style={styles.locationText}>Makati City, Metro Manila</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={14}
-                color={COLORS.accentPurple}
-              />
-            </TouchableOpacity>
+
+            <Text style={styles.locationText}>
+              Set location when requesting help
+            </Text>
           </View>
         </View>
 
-        {/* Greeting Banner */}
+        {/* Greeting */}
         <View style={styles.greetingRow}>
-          <View>
+          <View style={{ flex: 1, paddingRight: 8 }}>
             <Text style={styles.greetingEyebrow}>
-              Good morning, {user?.name || "Rider"}
+              WELCOME, {user?.name || "RIDER"}
             </Text>
-            <Text style={styles.greetingTitle}>Let's get you moving.</Text>
+            <Text style={styles.greetingTitle}>Let’s get you moving.</Text>
           </View>
+
           <View style={styles.onlinePill}>
             <View style={styles.onlineDot} />
-            <Text style={styles.onlineText}>24/7 online</Text>
+            <Text style={styles.onlineText}>Rider Buddy</Text>
           </View>
         </View>
 
-        {/* Vehicle Health Hero Card */}
+        {/* Motorcycle card */}
         <View style={styles.vehicleCard}>
           <View style={styles.vehicleCardTop}>
-            <View>
+            <View style={{ flex: 1, paddingRight: 10 }}>
               <View style={styles.vehicleEyebrowRow}>
-                <Ionicons name="car" size={14} color={COLORS.primary} />
-                <Text style={styles.vehicleEyebrowText}>YOUR VEHICLE</Text>
+                <Ionicons
+                  name="bicycle-outline"
+                  size={15}
+                  color={COLORS.primary}
+                />
+                <Text style={styles.vehicleEyebrowText}>YOUR MOTORCYCLE</Text>
               </View>
+
               <Text style={styles.vehicleTitle}>
                 {loadingGarage
                   ? "Loading your motorcycle..."
                   : selectedMotorcycle
-                    ? `${selectedMotorcycle.brand?.name ?? "Motorcycle"} ${selectedMotorcycle.model}`
+                    ? `${selectedMotorcycle.brand?.name ?? "Motorcycle"} ${
+                        selectedMotorcycle.model ?? ""
+                      }`.trim()
                     : "No motorcycle registered"}
               </Text>
 
@@ -417,14 +559,21 @@ export default function HomeScreen() {
                       selectedMotorcycle.plate_number,
                     ]
                       .filter(Boolean)
-                      .join(" · ")
+                      .join(" · ") || "Motorcycle details"
                   : loadingGarage
                     ? "Fetching your garage"
-                    : "Add a motorcycle to get started"}
+                    : "Add your motorcycle to get started"}
               </Text>
             </View>
-            <TouchableOpacity style={styles.switchBtn}>
-              <Text style={styles.switchBtnText}>Switch</Text>
+
+            <TouchableOpacity
+              style={styles.switchBtn}
+              onPress={switchMotorcycle}
+              disabled={loadingGarage}
+            >
+              <Text style={styles.switchBtnText}>
+                {motorcycles.length > 1 ? "Switch" : "View"}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -438,6 +587,7 @@ export default function HomeScreen() {
                 color={COLORS.primary}
                 style={{ marginRight: 10 }}
               />
+
               <View style={{ flex: 1 }}>
                 <Text style={styles.garagePromptTitle}>
                   {motorcycles.length} registered motorcycle
@@ -448,6 +598,7 @@ export default function HomeScreen() {
                 </Text>
               </View>
             </View>
+
             <TouchableOpacity
               style={styles.switchBtn}
               onPress={() => router.push("/(tabs)/garage")}
@@ -457,76 +608,70 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Quick Emergency Dispatch Banner */}
+        {/* Emergency assistance */}
         <TouchableOpacity
           style={styles.dispatchCard}
           activeOpacity={0.85}
           onPress={() => router.push("/(tabs)/consults")}
         >
-          <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              flex: 1,
+              paddingRight: 8,
+            }}
+          >
             <View style={styles.dispatchIconBox}>
               <Ionicons name="flash" size={22} color={COLORS.darkBg} />
             </View>
-            <View>
+
+            <View style={{ flex: 1 }}>
               <Text style={styles.dispatchEyebrow}>NEED HELP NOW?</Text>
-              <Text style={styles.dispatchTitle}>Dispatch a mechanic</Text>
-              <Text style={styles.dispatchSubtitle}>ETA from 12 minutes</Text>
+              <Text style={styles.dispatchTitle}>Find roadside assistance</Text>
+              <Text style={styles.dispatchSubtitle}>
+                Request help from a mechanic
+              </Text>
             </View>
           </View>
+
           <View style={styles.dispatchBtn}>
             <Text style={styles.dispatchBtnText}>Get help</Text>
-            <Ionicons name="chevron-forward" size={14} color="#FFF" />
+            <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
 
-        {/* Services Section */}
+        {/* Services */}
         <View style={styles.sectionHeader}>
           <View>
             <Text style={styles.sectionEyebrow}>EXPERT CARE</Text>
             <Text style={styles.sectionTitleText}>What do you need?</Text>
           </View>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Text style={styles.actionBtnText}>View all</Text>
-            <Ionicons
-              name="chevron-forward"
-              size={14}
-              color={COLORS.accentPurple}
-            />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.servicesGrid}>
-          {services.map((item) => {
-            const isSelected = selectedService === item.id;
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.serviceCard,
-                  isSelected && styles.serviceCardActive,
-                ]}
-                onPress={() => setSelectedService(item.id)}
-              >
-                <View
-                  style={[
-                    styles.serviceIconBox,
-                    isSelected && styles.serviceIconBoxActive,
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={22}
-                    color={COLORS.darkBg}
-                  />
-                </View>
-                <Text style={styles.serviceTitle}>{item.label}</Text>
-                <Text style={styles.serviceNote}>{item.note}</Text>
-              </TouchableOpacity>
-            );
-          })}
+          {services.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.serviceCard}
+              activeOpacity={0.8}
+              onPress={() => router.push("/(tabs)/consults")}
+            >
+              <View style={styles.serviceIconBox}>
+                <Ionicons
+                  name={item.icon as any}
+                  size={22}
+                  color={COLORS.darkBg}
+                />
+              </View>
+
+              <Text style={styles.serviceTitle}>{item.label}</Text>
+              <Text style={styles.serviceNote}>{item.note}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        {/* Live Mechanic Preview */}
+        {/* Mechanic preview */}
         <View style={styles.sectionHeader}>
           <View>
             <Text style={styles.sectionEyebrow}>RIDER BUDDY MECHANICS</Text>
@@ -566,10 +711,15 @@ export default function HomeScreen() {
                 mechanic.is_verified === true || mechanic.is_verified === 1;
 
               return (
-                <View key={mechanic.id} style={styles.mechanicCard}>
+                <TouchableOpacity
+                  key={mechanic.id}
+                  activeOpacity={0.85}
+                  style={styles.mechanicCard}
+                  onPress={() => router.push("/(tabs)/consults")}
+                >
                   <View style={styles.mechanicAvatarPlaceholder}>
                     <Ionicons
-                      name="construct"
+                      name="construct-outline"
                       size={30}
                       color={COLORS.accentPurple}
                     />
@@ -579,7 +729,7 @@ export default function HomeScreen() {
                   <View style={styles.mechanicInfo}>
                     <View style={styles.mechanicNameRow}>
                       <Text style={styles.mechanicName} numberOfLines={1}>
-                        {mechanic.shop_name || mechanic.name}
+                        {mechanic.shop_name || mechanic.name || "Mechanic"}
                       </Text>
 
                       {isVerified && (
@@ -626,42 +776,41 @@ export default function HomeScreen() {
                       {formatPeso(mechanic.diagnostic_fee_base)}
                     </Text>
                   </View>
-
-                  {isVerified && (
-                    <View style={styles.mechanicVerifiedMark}>
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={18}
-                        color={COLORS.success}
-                      />
-                    </View>
-                  )}
-                </View>
+                </TouchableOpacity>
               );
             })}
           </ScrollView>
         )}
 
-        {/* Care Plan Banner */}
-        <TouchableOpacity style={styles.membershipCard}>
-          <Ionicons name="shield-half" size={38} color={COLORS.primary} />
+        {/* Care plan - informational for now */}
+        <View style={styles.membershipCard}>
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={38}
+            color={COLORS.primary}
+          />
+
           <View style={{ flex: 1 }}>
             <Text
               style={{
-                fontSize: 8,
+                fontSize: 9,
                 fontWeight: "900",
                 color: COLORS.primary,
                 letterSpacing: 1,
               }}
             >
-              RIDER BUDDY + CARE PLAN
+              RIDER BUDDY
             </Text>
+
             <Text style={styles.membershipTitle}>
-              Save 20% on every service
+              Help when the road gets rough
             </Text>
-            <Text style={styles.membershipSub}>Explore membership</Text>
+
+            <Text style={styles.membershipSub}>
+              Your motorcycle support companion
+            </Text>
           </View>
-        </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
