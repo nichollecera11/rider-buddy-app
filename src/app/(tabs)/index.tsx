@@ -1,7 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import api from "../../api/client";
 import { COLORS } from "../../constants/theme";
@@ -22,37 +30,27 @@ export default function HomeScreen() {
   const [loadingMechanics, setLoadingMechanics] = useState(true);
   const [selectedService, setSelectedService] = useState("Roadside");
 
+  // Sidebar / Drawer state
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+
   const selectedMotorcycle = motorcycles.find(
     (motorcycle) => motorcycle.id === selectedMotorcycleId,
   );
-  // Prefer a mechanic who is both verified and available.
-  // This does NOT mean they are the nearest mechanic.
-  const featuredMechanic =
-    mechanics.find(
-      (mechanic) =>
-        mechanic.is_verified === true && mechanic.is_available === true,
-    ) ??
-    mechanics.find((mechanic) => mechanic.is_available === true) ??
-    mechanics[0] ??
-    null;
 
   const formatPeso = (amount: string | number | null | undefined) => {
     if (amount === null || amount === undefined || amount === "") {
       return "Fee not listed";
     }
-
     const value = Number(amount);
-
     if (!Number.isFinite(value)) {
       return "Fee not listed";
     }
-
     return `₱${value.toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
   };
-  //homestyle
+
   useEffect(() => {
     let isMounted = true;
 
@@ -69,9 +67,7 @@ export default function HomeScreen() {
 
         if (garageResult.status === "fulfilled") {
           const response = garageResult.value.data;
-
           const items = Array.isArray(response.data) ? response.data : [];
-
           setMotorcycles(items);
 
           const mainMotorcycle = items.find(
@@ -84,8 +80,6 @@ export default function HomeScreen() {
           } else if (items.length > 0) {
             setSelectedMotorcycleId(items[0].id);
           }
-        } else {
-          console.warn("Could not load garage:", garageResult.reason);
         }
 
         if (mechanicsResult.status === "fulfilled") {
@@ -95,10 +89,7 @@ export default function HomeScreen() {
             : Array.isArray(response.data?.data)
               ? response.data.data
               : [];
-
           setMechanics(items);
-        } else {
-          console.warn("Could not load mechanics:", mechanicsResult.reason);
         }
       } finally {
         if (isMounted) {
@@ -126,7 +117,7 @@ export default function HomeScreen() {
       id: "Maintenance",
       label: "Maintenance",
       note: "Keep it running",
-      icon: "oil-drop",
+      icon: "water-outline",
     },
     {
       id: "Tire care",
@@ -144,17 +135,25 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Navigation Header */}
+      {/* Top Navigation Header with Hamburger Menu Button */}
       <View style={styles.header}>
-        <View style={styles.logoGroup}>
-          <View>
-            <Image
-              source={require("../../../assets/images/rider_buddy_temp.png")}
-              style={styles.logoImage}
-              resizeMode="cover"
-            />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <TouchableOpacity
+            onPress={() => setSidebarVisible(true)}
+            style={{ padding: 4 }}
+          >
+            <Ionicons name="menu" size={24} color={COLORS.textDark} />
+          </TouchableOpacity>
+          <View style={styles.logoGroup}>
+            <View>
+              <Image
+                source={require("../../../assets/images/rider_buddy_temp.png")}
+                style={styles.logoImage}
+                resizeMode="cover"
+              />
+            </View>
+            <Text style={styles.logoText}>RIDER BUDDY</Text>
           </View>
-          <Text style={styles.logoText}>RIDER BUDDY</Text>
         </View>
 
         <TouchableOpacity style={styles.bellBtn}>
@@ -166,6 +165,195 @@ export default function HomeScreen() {
           <View style={styles.bellDot} />
         </TouchableOpacity>
       </View>
+
+      {/* Slide-out Sidebar / Drawer Navigation Modal */}
+      <Modal
+        visible={sidebarVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setSidebarVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            backgroundColor: "rgba(0,0,0,0.6)",
+          }}
+        >
+          {/* Sidebar Drawer Container */}
+          <View
+            style={{
+              width: "75%",
+              height: "100%",
+              backgroundColor: COLORS.darkBg,
+              paddingTop: 20,
+              paddingHorizontal: 20,
+              justifyContent: "space-between",
+            }}
+          >
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* User Profile Header inside Sidebar */}
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingVertical: 15,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "rgba(255,255,255,0.1)",
+                  marginBottom: 15,
+                }}
+                onPress={() => {
+                  setSidebarVisible(false);
+                  router.push("/(tabs)/profile");
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 22,
+                      backgroundColor: COLORS.primary,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Ionicons name="person" size={24} color={COLORS.darkBg} />
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        color: "#FFF",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {user?.name || "Rider"}
+                    </Text>
+                    <Text style={{ color: COLORS.textMuted, fontSize: 12 }}>
+                      View profile
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color={COLORS.textMuted}
+                />
+              </TouchableOpacity>
+
+              {/* Navigation Links */}
+              {[
+                { label: "City", icon: "car-sport-outline", route: "/(tabs)" },
+                {
+                  label: "Request history",
+                  icon: "time-outline",
+                  route: "/(tabs)/consults",
+                },
+                {
+                  label: "Notifications",
+                  icon: "notifications-outline",
+                  route: "/(tabs)",
+                },
+                { label: "Safety", icon: "shield-outline", route: "/(tabs)" },
+                {
+                  label: "Settings",
+                  icon: "settings-outline",
+                  route: "/(tabs)",
+                },
+                {
+                  label: "Help",
+                  icon: "help-circle-outline",
+                  route: "/(tabs)",
+                },
+                {
+                  label: "Support",
+                  icon: "chatbubble-outline",
+                  route: "/(tabs)",
+                },
+                {
+                  label: "Social discount",
+                  icon: "pricetag-outline",
+                  route: "/(tabs)",
+                },
+              ].map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 16,
+                    paddingVertical: 14,
+                  }}
+                  onPress={() => {
+                    setSidebarVisible(false);
+                    if (item.route) router.push(item.route as any);
+                  }}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={20}
+                    color={COLORS.textDark}
+                  />
+                  <Text
+                    style={{
+                      color: COLORS.textDark,
+                      fontSize: 15,
+                      fontWeight: "500",
+                    }}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {/* Bottom Actions inside Sidebar */}
+            <View
+              style={{
+                paddingBottom: 30,
+                paddingTop: 15,
+                borderTopWidth: 1,
+                borderTopColor: "rgba(255,255,255,0.1)",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  backgroundColor: COLORS.primary,
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  marginBottom: 15,
+                }}
+                onPress={() => setSidebarVisible(false)}
+              >
+                <Text
+                  style={{
+                    color: COLORS.darkBg,
+                    fontWeight: "bold",
+                    fontSize: 14,
+                  }}
+                >
+                  Driver mode
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Backdrop Tap to Close */}
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => setSidebarVisible(false)}
+          />
+        </View>
+      </Modal>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -337,8 +525,6 @@ export default function HomeScreen() {
             );
           })}
         </View>
-
-        {/* Top Mechanic Nearby Section */}
 
         {/* Live Mechanic Preview */}
         <View style={styles.sectionHeader}>

@@ -4,7 +4,6 @@ import {
   Alert,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -59,6 +58,14 @@ type MechanicsResponse = {
     total: number;
   };
 };
+type SOSConsultation = {
+  id: number;
+  status: string;
+  issue_description: string;
+  mechanic_id: number;
+  user_motorcycle_id: number;
+  agreed_diagnostic_fee?: string | number;
+};
 
 export default function ConsultsScreen() {
   const [mechanics, setMechanics] = useState<Mechanic[]>([]);
@@ -74,6 +81,9 @@ export default function ConsultsScreen() {
   >(null);
 
   const [issueDescription, setIssueDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeConsultation, setActiveConsultation] =
+    useState<SOSConsultation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -154,7 +164,9 @@ export default function ConsultsScreen() {
     void loadMotorcycles();
   }, [loadMotorcycles]);
 
-  const handleFindAssistance = () => {
+  const handleFindAssistance = async () => {
+    if (isSubmitting) return;
+
     if (selectedMotorcycleId === null) {
       Alert.alert(
         "Select your motorcycle",
@@ -176,11 +188,65 @@ export default function ConsultsScreen() {
       return;
     }
 
-    Alert.alert(
-      "Ready for the next step",
-      "Your motorcycle and issue description are ready. We still need to connect mechanic discovery and SOS submission.",
-    );
+    setIsSubmitting(true);
+
+    try {
+      const response = await client.post("/consultations", {
+        user_motorcycle_id: selectedMotorcycleId,
+        mechanic_id: selectedMechanicId,
+        consultation_type: "sos",
+        issue_description: issueDescription.trim(),
+      });
+
+      const consultation = response.data.data as SOSConsultation;
+
+      setActiveConsultation(consultation);
+
+      console.log("SOS consultation created:", consultation);
+
+      Alert.alert(
+        "SOS request submitted",
+        `Your request #${consultation.id} has been created.`,
+      );
+    } catch (error: any) {
+      console.error(
+        "SOS submission failed:",
+        error.response?.data ?? error.message,
+      );
+
+      const message =
+        error.response?.data?.message ??
+        "We couldn't submit your request. Please check your connection and try again.";
+
+      Alert.alert("Request failed", message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const INITIAL_MAP_REGION = {
+    latitude: 8.4542,
+    longitude: 124.6319,
+    latitudeDelta: 0.08,
+    longitudeDelta: 0.08,
+  };
+  const mappableMechanics = mechanics.filter((mechanic) => {
+    if (mechanic.latitude == null || mechanic.longitude == null) {
+      return false;
+    }
+
+    const latitude = Number(mechanic.latitude);
+    const longitude = Number(mechanic.longitude);
+
+    return (
+      Number.isFinite(latitude) &&
+      latitude >= -90 &&
+      latitude <= 90 &&
+      Number.isFinite(longitude) &&
+      longitude >= -180 &&
+      longitude <= 180
+    );
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -361,38 +427,70 @@ export default function ConsultsScreen() {
           )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>2. Describe the problem</Text>
+        {activeConsultation && (
+          <View
+            style={{
+              backgroundColor: COLORS.cardWhite,
+              borderColor: COLORS.success,
+              borderWidth: 1,
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 16,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "700",
+                color: COLORS.textDark,
+              }}
+            >
+              SOS Request Created
+            </Text>
 
-          <Text style={styles.inputHint}>
-            Minimum 10 characters. Explain what happened.
-          </Text>
+            <Text style={{ color: COLORS.textMuted, marginTop: 8 }}>
+              Request ID: #{activeConsultation.id}
+            </Text>
 
-          <TextInput
-            accessibilityLabel="Describe your motorcycle problem"
-            value={issueDescription}
-            onChangeText={setIssueDescription}
-            placeholder="Example: My engine suddenly stopped while riding..."
-            placeholderTextColor="#A895B5"
-            multiline
-            textAlignVertical="top"
-            maxLength={1000}
-            style={styles.input}
-          />
+            <Text style={{ color: COLORS.textDark, marginTop: 6 }}>
+              Status: {activeConsultation.status}
+            </Text>
 
-          <Text style={styles.characterCount}>
-            {issueDescription.length}/1000 characters
-          </Text>
-        </View>
+            <Text style={{ color: COLORS.textDark, marginTop: 6 }}>
+              Mechanic:{" "}
+              {mechanics.find((m) => m.id === activeConsultation.mechanic_id)
+                ?.name ?? "Selected mechanic"}
+            </Text>
+
+            <Text style={{ color: COLORS.textDark, marginTop: 6 }}>
+              Issue: {activeConsultation.issue_description}
+            </Text>
+
+            <Text
+              style={{ color: COLORS.textMuted, marginTop: 10, fontSize: 12 }}
+            >
+              Keep your request ID for reference. Check your request status for
+              updates.
+            </Text>
+          </View>
+        )}
 
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel="Find roadside assistance"
+          accessibilityState={{ disabled: isSubmitting }}
+          disabled={isSubmitting}
           activeOpacity={0.8}
           onPress={handleFindAssistance}
-          style={styles.submitButton}
+          style={[styles.submitButton, isSubmitting && { opacity: 0.6 }]}
         >
-          <Text style={styles.submitButtonText}>FIND ROADSIDE ASSISTANCE</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color={COLORS.darkBg} />
+          ) : (
+            <Text style={styles.submitButtonText}>
+              FIND ROADSIDE ASSISTANCE
+            </Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.footerNote}>
