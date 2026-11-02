@@ -1,12 +1,12 @@
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    RefreshControl,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,6 +29,7 @@ type Consultation = {
 };
 
 export default function RequestsScreen() {
+  const router = useRouter();
   const [requests, setRequests] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -58,6 +59,14 @@ export default function RequestsScreen() {
         throw new Error("Unexpected consultations response format.");
       }
 
+      console.log(
+        "Updated consultation statuses:",
+        records.map((item: Consultation) => ({
+          id: item.id,
+          status: item.status,
+        })),
+      );
+
       setRequests(records);
     } catch {
       setError("Couldn't load your requests. Check your connection and retry.");
@@ -75,6 +84,8 @@ export default function RequestsScreen() {
 
   const statusColor = (status: string) => {
     switch (status.toLowerCase()) {
+      case "accepted":
+        return COLORS.accentPurple;
       case "ongoing":
         return COLORS.success;
       case "pending":
@@ -200,7 +211,14 @@ export default function RequestsScreen() {
             </View>
           }
           renderItem={({ item }) => (
-            <View
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() =>
+                router.push({
+                  pathname: "/consultation/[id]",
+                  params: { id: String(item.id) },
+                })
+              }
               style={{
                 backgroundColor: COLORS.cardWhite,
                 borderRadius: 18,
@@ -339,7 +357,7 @@ export default function RequestsScreen() {
                   Created: {item.created_at}
                 </Text>
               ) : null}
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
