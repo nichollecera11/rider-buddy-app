@@ -10,6 +10,13 @@ interface AuthContextType {
   isInitializing: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -56,6 +63,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setToken(userToken);
     setUser(userData);
   };
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+  ) => {
+    await client.post("/register", {
+      name,
+      email,
+      password,
+      password_confirmation,
+    });
+  };
 
   const logout = async () => {
     try {
@@ -77,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         loading,
         isInitializing: loading,
         login,
+        register,
         logout,
       }}
     >

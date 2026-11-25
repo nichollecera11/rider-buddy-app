@@ -4,14 +4,20 @@ import {
   Alert,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useRouter } from "expo-router";
 import client from "../../api/client";
 import { COLORS } from "../../constants/theme";
 import { styles } from "../../styles/consults.styles";
+import {
+  getCurrentBreakdownLocation,
+  type BreakdownLocation,
+} from "../../utils/location";
 
 type Motorcycle = {
   id: number;
@@ -68,10 +74,12 @@ type SOSConsultation = {
 };
 
 export default function ConsultsScreen() {
+  const router = useRouter();
   const [mechanics, setMechanics] = useState<Mechanic[]>([]);
   const [selectedMechanicId, setSelectedMechanicId] = useState<number | null>(
     null,
   );
+
   const [isLoadingMechanics, setIsLoadingMechanics] = useState(true);
   const [mechanicError, setMechanicError] = useState<string | null>(null);
 
@@ -81,6 +89,12 @@ export default function ConsultsScreen() {
   >(null);
 
   const [issueDescription, setIssueDescription] = useState("");
+  const [manualLocationName, setManualLocationName] = useState("");
+  const [breakdownLocation, setBreakdownLocation] =
+    useState<BreakdownLocation | null>(null);
+
+  const [isCapturingLocation, setIsCapturingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submissionLock = useRef(false);
   const [activeConsultation, setActiveConsultation] =
@@ -164,6 +178,34 @@ export default function ConsultsScreen() {
   useEffect(() => {
     void loadMotorcycles();
   }, [loadMotorcycles]);
+  const handleCaptureLocation = async () => {
+    if (isCapturingLocation) return;
+
+    setIsCapturingLocation(true);
+    setLocationError(null);
+
+    try {
+      const location = await getCurrentBreakdownLocation();
+
+      setBreakdownLocation(location);
+      setManualLocationName("");
+
+      Alert.alert(
+        "Location captured",
+        `GPS accuracy: approximately ${Math.round(location.accuracy)} meters.`,
+      );
+    } catch (error) {
+      setBreakdownLocation(null);
+
+      setLocationError(
+        error instanceof Error
+          ? error.message
+          : "Unable to capture your location. Please try again.",
+      );
+    } finally {
+      setIsCapturingLocation(false);
+    }
+  };
 
   const handleFindAssistance = async () => {
     if (submissionLock.current) return;
@@ -189,25 +231,45 @@ export default function ConsultsScreen() {
       return;
     }
 
+    const trimmedManualLocation = manualLocationName.trim();
+
+    if (!breakdownLocation && !trimmedManualLocation) {
+      Alert.alert(
+        "Breakdown location required",
+        "Please capture your GPS location or enter a manual location before requesting assistance.",
+      );
+      return;
+    }
+
     submissionLock.current = true;
     setIsSubmitting(true);
 
     try {
+      const locationPayload = breakdownLocation
+        ? {
+            latitude: breakdownLocation.latitude,
+            longitude: breakdownLocation.longitude,
+          }
+        : {
+            location_name: trimmedManualLocation,
+          };
+
       const response = await client.post("/consultations", {
         user_motorcycle_id: selectedMotorcycleId,
         mechanic_id: selectedMechanicId,
         consultation_type: "sos",
         issue_description: issueDescription.trim(),
+        ...locationPayload,
       });
 
       const consultation = response.data.data as SOSConsultation;
 
       setActiveConsultation(consultation);
 
-      Alert.alert(
-        "SOS request submitted",
-        `Your request #${consultation.id} has been created.`,
-      );
+      router.push({
+        pathname: "/consultation/[id]",
+        params: { id: String(consultation.id) },
+      });
     } catch (error: any) {
       console.error(
         "SOS submission failed:",
@@ -426,6 +488,115 @@ export default function ConsultsScreen() {
               );
             })
           )}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>3. Describe your problem</Text>
+
+          <Text style={styles.sectionDescription}>
+            Tell the mechanic what happened to your motorcycle.
+          </Text>
+
+          <TextInput
+            value={issueDescription}
+            onChangeText={setIssueDescription}
+            placeholder="Example: My motorcycle suddenly stopped running. The engine won't start."
+            placeholderTextColor={COLORS.textMuted}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            style={{
+              borderWidth: 1,
+              borderColor: COLORS.borderLight,
+              borderRadius: 10,
+              padding: 12,
+              minHeight: 110,
+              color: COLORS.textDark,
+              backgroundColor: COLORS.cardWhite,
+            }}
+            maxLength={1000}
+          />
+
+          <Text style={styles.garageHint}>
+            {issueDescription.trim().length}/1000 characters (minimum 10)
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>4. Breakdown location</Text>
+
+          <Text style={styles.sectionDescription}>
+            Share your current location so your selected mechanic can find you.
+          </Text>
+
+          <TouchableOpacity
+            accessibilityRole="button"
+            disabled={isCapturingLocation}
+            onPress={handleCaptureLocation}
+            style={[
+              styles.submitButton,
+              isCapturingLocation && { opacity: 0.6 },
+            ]}
+          >
+            {isCapturingLocation ? (
+              <ActivityIndicator color={COLORS.darkBg} />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                {breakdownLocation
+                  ? "REFRESH GPS LOCATION"
+                  : "CAPTURE GPS LOCATION"}
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {breakdownLocation && (
+            <View style={styles.garageState}>
+              <Text style={styles.mechanicBadge}>GPS LOCATION CAPTURED</Text>
+              <Text style={styles.garageStateText}>
+                Accuracy: approximately {Math.round(breakdownLocation.accuracy)}{" "}
+                meters
+              </Text>
+              <Text style={styles.garageHint}>
+                Coordinates: {breakdownLocation.latitude.toFixed(6)},{" "}
+                {breakdownLocation.longitude.toFixed(6)}
+              </Text>
+            </View>
+          )}
+
+          {locationError && (
+            <Text style={styles.garageError}>{locationError}</Text>
+          )}
+        </View>
+
+        <View style={{ marginTop: 12 }}>
+          <Text style={styles.sectionDescription}>
+            GPS unavailable? Describe a nearby landmark or your exact roadside
+            location.
+          </Text>
+
+          <TextInput
+            value={manualLocationName}
+            onChangeText={(text) => {
+              setManualLocationName(text);
+              if (text.trim().length > 0) {
+                setBreakdownLocation(null);
+              }
+            }}
+            placeholder="Example: Near SM City CDO main entrance"
+            placeholderTextColor={COLORS.textMuted}
+            multiline
+            maxLength={255}
+            style={{
+              backgroundColor: COLORS.cardWhite,
+              color: COLORS.textDark,
+              borderWidth: 1,
+              borderColor: COLORS.borderLight,
+              borderRadius: 10,
+              padding: 12,
+              minHeight: 80,
+              textAlignVertical: "top",
+            }}
+          />
         </View>
 
         {activeConsultation && (

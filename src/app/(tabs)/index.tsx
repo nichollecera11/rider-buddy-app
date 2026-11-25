@@ -612,7 +612,9 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={styles.dispatchCard}
           activeOpacity={0.85}
-          onPress={() => router.push("/(tabs)/consults")}
+          onPress={() => {
+            router.push("/(tabs)/consults");
+          }}
         >
           <View
             style={{

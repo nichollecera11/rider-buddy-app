@@ -35,7 +35,13 @@
       ],
       "expo-secure-store",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Rider Buddy to access your location to share your motorcycle breakdown location with nearby mechanics."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

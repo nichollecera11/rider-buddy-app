@@ -32,19 +32,21 @@ export function setSessionEndedHandler(handler: (() => void) | null) {
 }
 
 // Registered once, at module level
+
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
+    console.log("[API ERROR DETAILS]", {
+      method: error.config?.method,
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+
     const status: number | undefined = error.response?.status;
     const message: string = String(error.response?.data?.message ?? "");
     const isLoginCall = String(error.config?.url ?? "").includes("/login");
 
-    // The session is really over only when:
-    //  - 401: the token is missing, expired or revoked (this is also what a ban leaves behind), or
-    //  - 403 with "banned": the not.banned middleware answering a banned account.
-    // Every OTHER 403 is an ordinary "you are not allowed to do that" (someone else's record,
-    // "You already have a seller profile", ...). It must NOT sign the user out.
-    // A failed login is also not a dead session: the login screen shows that message itself.
     const sessionEnded =
       !isLoginCall &&
       (status === 401 ||

@@ -98,7 +98,14 @@ export default function TabsLayout() {
       />
 
       {/* SOS form remains accessible through its existing route. */}
-      <Tabs.Screen name="consults" options={{ href: null }} />
+      <Tabs.Screen
+        name="consults"
+        options={{
+          tabBarItemStyle: {
+            display: "none",
+          },
+        }}
+      />
 
       {/* Keep Shop available without showing it in the tab bar. */}
       <Tabs.Screen name="shop" options={{ href: null }} />

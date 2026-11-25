@@ -34,7 +34,6 @@ function RootLayoutNav() {
   useEffect(() => {
     // Wait until both auth session is restored and fonts are loaded
     if (isInitializing || !fontsLoaded) return;
-
     // Hide splash screen smoothly
     SplashScreen.hideAsync();
 
